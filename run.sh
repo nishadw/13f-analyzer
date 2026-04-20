@@ -134,7 +134,7 @@ echo "Starting backend: https://localhost:${BACKEND_PORT}"
 "${BACKEND_CMD[@]}" &
 BACKEND_PID=$!
 
-echo "Starting frontend: http://localhost:${FRONTEND_PORT}/stocks"
+echo "Starting frontend: http://localhost:${FRONTEND_PORT}"
 "${FRONTEND_CMD[@]}" &
 FRONTEND_PID=$!
 
@@ -146,7 +146,7 @@ trap cleanup EXIT INT TERM
 
 echo ""
 echo "App URLs:"
-echo "  Frontend: http://localhost:${FRONTEND_PORT}/stocks"
+echo "  Frontend: http://localhost:${FRONTEND_PORT}"
 echo "  Backend:  https://localhost:${BACKEND_PORT}"
 echo ""
 echo "Press Ctrl+C to stop both services."

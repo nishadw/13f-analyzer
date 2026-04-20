@@ -1,15 +1,12 @@
 """
-Start the API backend server over HTTPS.
+Start the API backend server.
 
-HTTPS avoids browser mixed-content issues when a secure frontend calls localhost.
-
-First run: visit https://localhost:7779 in your browser and click
-"Advanced → Proceed to localhost" to accept the self-signed certificate.
-Then point your frontend client to https://localhost:7779.
+Locally: runs HTTPS (self-signed cert) to avoid mixed-content issues.
+Production (Render): runs plain HTTP — Render handles TLS at the edge.
 
 Usage:
-    python scripts/serve.py           # HTTPS on port 7779
-    python scripts/serve.py --reload  # dev mode with hot-reload
+    python scripts/serve.py           # auto-detects SSL
+    python scripts/serve.py --reload  # dev hot-reload
 """
 from __future__ import annotations
 
@@ -27,26 +24,18 @@ _KEY  = Path(__file__).parent.parent / "api_backend" / "key.pem"
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--reload", action="store_true")
-    parser.add_argument("--port", type=int, default=7779)
-    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--port",   type=int, default=7779)
+    parser.add_argument("--host",   default="0.0.0.0")
     args = parser.parse_args()
 
-    if not _CERT.exists() or not _KEY.exists():
-        print("ERROR: TLS cert/key not found. Run from project root:")
-        print("  openssl req -x509 -newkey rsa:2048 -keyout api_backend/key.pem "
-              "-out api_backend/cert.pem -days 825 -nodes -subj '/CN=localhost'")
-        sys.exit(1)
-
-    print(f"\n  Server: https://localhost:{args.port}")
-    print("  STEP 1: Open https://localhost:7779 in your browser")
-    print("          Click Advanced -> Proceed to localhost (unsafe)")
-    print("  STEP 2: Point your frontend/backend client to: https://localhost:7779\n")
+    use_ssl = _CERT.exists() and _KEY.exists()
+    scheme  = "https" if use_ssl else "http"
+    print(f"\n  Backend: {scheme}://{args.host}:{args.port}\n")
 
     uvicorn.run(
         "api_backend.main:app",
         host=args.host,
         port=args.port,
         reload=args.reload,
-        ssl_certfile=str(_CERT),
-        ssl_keyfile=str(_KEY),
+        **({"ssl_certfile": str(_CERT), "ssl_keyfile": str(_KEY)} if use_ssl else {}),
     )

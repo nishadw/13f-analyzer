@@ -24,9 +24,17 @@ MARKET_DATA_PROVIDER: str = "yfinance"
 # Tracked funds:
 # 1350694 = Bridgewater Associates, 1423053 = Citadel,
 # 1336528 = Pershing Square, 2045724 = Situational Awareness LP,
-# 1037389 = Renaissance Technologies
+# 1037389 = Renaissance Technologies,
+# 1179392 = Two Sigma Investments LP, 1478735 = Two Sigma Advisers LP,
+# 1009207 = D. E. Shaw & Co., 1167557 = AQR Capital Management,
+# 1603465 = Cubist Systematic Strategies, 1603466 = Point72 Asset Management,
+# 1564702 = PDT Partners
 TARGET_CIKS: list[str] = [
-    c.strip() for c in os.environ.get("TARGET_CIKS", "1350694,1423053,1336528,2045724,1037389").split(",")
+    c.strip() for c in os.environ.get(
+        "TARGET_CIKS",
+        "1350694,1423053,1336528,2045724,1037389,"
+        "1179392,1478735,1009207,1167557,1603465,1603466,1564702",
+    ).split(",")
 ]
 
 PROXY_ETFS: list[str] = [

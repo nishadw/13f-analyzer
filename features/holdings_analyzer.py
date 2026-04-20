@@ -9,9 +9,6 @@ Groups 13F holdings by fund and provides:
 """
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Optional
-
 import pandas as pd
 
 import config
@@ -321,16 +318,18 @@ def compare_funds(ciks: list[str], top_n: int = 15) -> dict:
 
 
 def _get_fund_name(cik: str) -> str:
-    """Map CIK to fund name."""
+    """Look up fund name from fund_names.json (populated during ingestion)."""
+    import json as _json
     cik_norm = _normalize_cik(cik)
-    names = {
-        "1350694": "Bridgewater Associates",
-        "1423053": "Citadel",
-        "1336528": "Pershing Square",
-        "2045724": "Leopold's Situational Awareness",
-        "1037389": "Renaissance Technologies",
-    }
-    return names.get(cik_norm, cik)
+    path = config.DATA_DIR / "fund_names.json"
+    if path.exists():
+        try:
+            names = _json.loads(path.read_text())
+            if cik_norm in names:
+                return names[cik_norm]
+        except Exception:
+            pass
+    return cik_norm
 
 
 def get_sector_breakdown_for_fund(cik: str) -> dict[str, float]:

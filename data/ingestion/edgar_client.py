@@ -50,6 +50,15 @@ def _get_submissions(cik: str) -> dict:
     return _get(url).json()
 
 
+def fetch_fund_name(cik: str) -> str:
+    """Return the fund's legal name from EDGAR submissions JSON."""
+    try:
+        data = _get_submissions(cik)
+        return data.get("name", cik)
+    except Exception:
+        return cik
+
+
 def _extract_13f_filings(section: dict) -> list[dict]:
     """
     Extract 13F-HR filing rows from a submissions JSON 'recent' block.

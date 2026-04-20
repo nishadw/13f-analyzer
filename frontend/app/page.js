@@ -2,17 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const FUND_PRIORITY = [
-  { aliases: ["bridgewater associates", "bridgewater"] },
-  { aliases: ["citadel"] },
-  { aliases: ["pershing square"] },
-  { ciks: ["1037389"], aliases: ["renaissance technologies", "renaissance tech"] },
-  { ciks: ["2045724"], aliases: ["situational awareness", "situational awareness lp", "leopold's situational awareness"] },
-];
-
-function normalizeText(v) {
-  return String(v || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
-}
+const GITHUB_URL = "https://github.com/nishadw/13f-analyzer";
 
 function uniqueByKey(rows, key) {
   const seen = new Set();
@@ -26,34 +16,16 @@ function uniqueByKey(rows, key) {
   return out;
 }
 
-function pickPriorityFunds(allFunds) {
-  const rows = Array.isArray(allFunds) ? allFunds : [];
-  const used = new Set();
-  const selected = [];
-  for (const priority of FUND_PRIORITY) {
-    const match = rows.find((f) => {
-      if (!f?.cik || used.has(f.cik)) return false;
-      const cikNorm = normalizeText(f.cik);
-      const name = normalizeText(f.name);
-      const cikMatch = Array.isArray(priority.ciks) && priority.ciks.some((cik) => cikNorm === normalizeText(cik));
-      const nameMatch = Array.isArray(priority.aliases) && priority.aliases.some((alias) => name.includes(normalizeText(alias)));
-      return cikMatch || nameMatch;
-    });
-    if (match) { used.add(match.cik); selected.push(match); }
-  }
-  if (selected.length === 0) return [...rows].sort((a, b) => String(a.name).localeCompare(String(b.name)));
-  const remaining = rows.filter((f) => !used.has(f.cik)).sort((a, b) => String(a.name).localeCompare(String(b.name)));
-  return [...selected, ...remaining];
+function sortFunds(funds) {
+  return [...(Array.isArray(funds) ? funds : [])].sort(
+    (a, b) => Number(b.total_value_usd_mm || 0) - Number(a.total_value_usd_mm || 0)
+  );
 }
 
-function fmtMoney(v)    { return `$${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}M`; }
+function fmtMoney(v)    { return `$${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}M`; }
 function fmtPct(v, d=2) { return `${Number(v || 0).toFixed(d)}%`; }
 function fmtCik(v) { return String(v || "").replace(/^0+/, "") || "0"; }
-function displayName(name) {
-  const n = String(name || "").trim();
-  if (/situational awareness/i.test(n)) return "Situational Awareness";
-  return n;
-}
+function displayName(name) { return String(name || "").trim() || "—"; }
 
 function fmtSignal(v) {
   const n = Number(v || 0);
@@ -61,81 +33,159 @@ function fmtSignal(v) {
   return <span className={cls}>{n >= 0 ? "+" : ""}{n.toFixed(3)}</span>;
 }
 
-// ── Summary: top conviction signals ──────────────────────────────────────────
+// ── Nav ───────────────────────────────────────────────────────────────────────
 
-function ConvictionSection({ rows, emptyMsg, fundNames }) {
-  if (!rows || rows.length === 0) return <p className="meta">{emptyMsg}</p>;
+function TopNav({ activeView, setActiveView, selectedFunds, isFundView }) {
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Company</th>
-          <th title="ML conviction score: +1 = strong increase, -1 = strong decrease">Signal</th>
-          <th title="3-month price return %">Mom 3M</th>
-          <th title="6-month price return %">Mom 6M</th>
-          <th title="Sector ETF proxy">Sector</th>
-          <th title="Which tracked fund drove this signal">Top Fund</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={`${r.ticker || r.cusip}-${i}`}>
-            <td><strong>{r.ticker || "-"}</strong></td>
-            <td>{r.name || "-"}</td>
-            <td>{fmtSignal(r.signal)}</td>
-            <td>{r.momentum_3m != null ? fmtPct(r.momentum_3m) : "-"}</td>
-            <td>{r.momentum_6m != null ? fmtPct(r.momentum_6m) : "-"}</td>
-            <td>{r.sector || "-"}</td>
-            <td style={{ fontSize: "0.8em", color: "#64748b" }}>
-              {fundNames?.[r.fund_cik] || r.fund_cik || "-"}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <nav className="topnav">
+      <div className="topnav-inner">
+        <a className="topnav-brand" href="/">
+          <div className="topnav-logo">13F</div>
+          <span className="topnav-title">13F Analyzer</span>
+        </a>
+        <div className="topnav-tabs">
+          <button
+            type="button"
+            className={`tab-btn ${activeView === "summary" ? "active" : ""}`}
+            onClick={() => setActiveView("summary")}
+          >
+            Summary
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${activeView === "models" ? "active" : ""}`}
+            onClick={() => setActiveView("models")}
+          >
+            Models
+          </button>
+          <div className="tab-dropdown-wrapper">
+            <button type="button" className={`tab-btn ${isFundView ? "active" : ""}`}>
+              Funds ▾
+            </button>
+            <div className="tab-dropdown">
+              {selectedFunds.map((fund) => (
+                <button
+                  key={fund.cik}
+                  type="button"
+                  className={`tab-dropdown-item ${activeView === fund.cik ? "active" : ""}`}
+                  onClick={() => setActiveView(fund.cik)}
+                >
+                  {displayName(fund.name)}
+                  {Number(fund.num_positions || 0) === 0 ? " · no data" : ""}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }
 
-function TrackedFunds({ funds, onFundClick }) {
+// ── Hero strip ─────────────────────────────────────────────────────────────────
+
+function Hero({ subtitle }) {
   return (
-    <div className="card">
-      <h2>Tracked Funds</h2>
-      <p className="meta">Click a row to open that fund's holdings tab.</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Fund</th><th>CIK</th><th>Latest Filing</th><th>Positions</th><th>Total Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {funds.map((f) => (
-            <tr key={f.cik} className="clickable-row" onClick={() => onFundClick?.(f.cik)}>
-              <td>{displayName(f.name)}</td>
-              <td>{fmtCik(f.cik)}</td>
-              <td>{f.latest_period || "-"}</td>
-              <td>{Number(f.num_positions || 0).toLocaleString()}</td>
-              <td>{fmtMoney(f.total_value_usd_mm)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="hero">
+      <div className="hero-inner">
+        <h1>Institutional Portfolio Intelligence</h1>
+        <p>{subtitle || "Track 13F filings from top hedge funds, analyse position changes, and view ML-driven conviction signals in real time."}</p>
+      </div>
     </div>
   );
 }
 
-// ── Per-fund holdings ─────────────────────────────────────────────────────────
+// ── Footer ─────────────────────────────────────────────────────────────────────
+
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <div className="name">13F Analyzer</div>
+          <p>Open-source tool for tracking institutional 13F filings, analysing position changes, and generating ML conviction signals across top hedge funds.</p>
+        </div>
+        <div className="footer-links">
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHub — nishadw/13f-analyzer
+          </a>
+          <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer">
+            Issues &amp; feedback
+          </a>
+          <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=13F" target="_blank" rel="noopener noreferrer">
+            SEC EDGAR 13F Filings
+          </a>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>© {new Date().getFullYear()} 13F Analyzer. Data sourced from SEC EDGAR — for informational purposes only, not investment advice.</span>
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
+      </div>
+    </footer>
+  );
+}
+
+// ── Summary tab ────────────────────────────────────────────────────────────────
+
+function TrackedFunds({ funds, onFundClick }) {
+  const totalFunds = funds.length;
+  const totalPositions = funds.reduce((s, f) => s + Number(f.num_positions || 0), 0);
+
+  return (
+    <>
+      <div className="stat-row">
+        <div className="stat-chip">
+          <div className="label">Tracked Funds</div>
+          <div className="value">{totalFunds}</div>
+        </div>
+        <div className="stat-chip">
+          <div className="label">Total Positions</div>
+          <div className="value">{totalPositions.toLocaleString()}</div>
+        </div>
+        <div className="stat-chip">
+          <div className="label">Latest Filing</div>
+          <div className="value">{funds[0]?.latest_period?.slice(0, 7) || "—"}</div>
+        </div>
+      </div>
+      <div className="card">
+        <h2>Tracked Funds</h2>
+        <p className="meta">Click a row to inspect that fund's current holdings.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Fund</th><th>CIK</th><th>Latest Filing</th><th>Positions</th><th>AUM (approx.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {funds.map((f) => (
+              <tr key={f.cik} className="clickable-row" onClick={() => onFundClick?.(f.cik)}>
+                <td><strong>{displayName(f.name)}</strong></td>
+                <td style={{ color: "#64748b" }}>{fmtCik(f.cik)}</td>
+                <td>{f.latest_period || "—"}</td>
+                <td>{Number(f.num_positions || 0).toLocaleString()}</td>
+                <td>{fmtMoney(f.total_value_usd_mm)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+// ── Fund holdings ──────────────────────────────────────────────────────────────
 
 function HoldingsTable({ fund, rows, loading, onRowClick, selectedStock }) {
   return (
     <div className="card">
       <h2>{displayName(fund.name)} — Holdings</h2>
-      <p className="meta">CIK: {fmtCik(fund.cik)} | Last Filing: {fund.latest_period || "N/A"}</p>
-      {loading ? <p>Loading holdings…</p> : rows.length === 0 ? <p>No holdings found.</p> : (
+      <p className="meta">CIK {fmtCik(fund.cik)} · Latest filing {fund.latest_period || "N/A"}</p>
+      {loading ? <p>Loading holdings…</p> : rows.length === 0 ? <p>No holdings data available.</p> : (
         <table>
           <thead>
             <tr>
-              <th>Rank</th><th>Name</th><th>Ticker</th><th>CUSIP</th>
+              <th>#</th><th>Company</th><th>Ticker</th><th>CUSIP</th>
               <th>Weight</th><th>Value</th><th>Shares</th><th>Sector</th>
             </tr>
           </thead>
@@ -146,14 +196,14 @@ function HoldingsTable({ fund, rows, loading, onRowClick, selectedStock }) {
                 className={`clickable-row ${selectedStock?.cusip === r.cusip ? "selected" : ""}`}
                 onClick={() => onRowClick?.(r)}
               >
-                <td>{r.rank}</td>
+                <td style={{ color: "#94a3b8" }}>{r.rank}</td>
                 <td>{r.name}</td>
-                <td>{r.ticker || "-"}</td>
-                <td>{r.cusip || "-"}</td>
+                <td><strong>{r.ticker || "—"}</strong></td>
+                <td style={{ color: "#94a3b8", fontSize: "0.78em" }}>{r.cusip || "—"}</td>
                 <td>{fmtPct(r.weight_pct)}</td>
                 <td>{fmtMoney(r.value_usd_mm)}</td>
                 <td>{Number(r.shares || 0).toLocaleString()}</td>
-                <td>{r.sector || "-"}</td>
+                <td>{r.sector || "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -170,18 +220,18 @@ function StockHistogram({ history, loading, stock }) {
 
   return (
     <div className="card history-card">
-      <h2>4-Filing Size Histogram</h2>
+      <h2>Position Size History</h2>
       <p className="meta">
-        {stock ? `${stock.name || "Selected stock"}${stock.ticker ? ` (${stock.ticker})` : ""}` : "Click a holding row to inspect its weight history."}
+        {stock ? `${stock.name || "Selected"}${stock.ticker ? ` (${stock.ticker})` : ""}` : "Click any holding row to see its weight across the last 4 filings."}
       </p>
       {loading ? <p>Loading…</p> : !history || values.length === 0 ? (
-        <p>Click any holding to view its weight over the past 4 filings.</p>
+        <p style={{ color: "#94a3b8" }}>Click any row above to inspect its history.</p>
       ) : (
         <>
           <div className="histogram-shell">
             <div className="histogram-boxes">
               {values.map((value, i) => {
-                const heightPct = Math.max(18, Math.round((Number(value || 0) / maxVal) * 100));
+                const heightPct = Math.max(14, Math.round((Number(value || 0) / maxVal) * 100));
                 const delta = i === 0 ? 0 : Number((value - values[i - 1]).toFixed(2));
                 return (
                   <div className="histogram-box-wrap" key={`${periods[i] || i}-${value}`}>
@@ -192,7 +242,7 @@ function StockHistogram({ history, loading, stock }) {
                       </div>
                     </div>
                     <div className={`histogram-change ${delta >= 0 ? "positive" : "negative"}`}>
-                      {i === 0 ? "Start" : `${delta >= 0 ? "+" : ""}${fmtPct(delta)}`}
+                      {i === 0 ? "start" : `${delta >= 0 ? "+" : ""}${fmtPct(delta)}`}
                     </div>
                   </div>
                 );
@@ -200,9 +250,9 @@ function StockHistogram({ history, loading, stock }) {
             </div>
           </div>
           <div className="history-summary">
-            <span>Increase total: {fmtPct(history.increase_total || 0)}</span>
-            <span>Decrease total: {fmtPct(history.decrease_total || 0)}</span>
-            <span>Net change: {fmtPct(history.net_change || 0)}</span>
+            <span>Increase total: <strong>{fmtPct(history.increase_total || 0)}</strong></span>
+            <span>Decrease total: <strong>{fmtPct(history.decrease_total || 0)}</strong></span>
+            <span>Net change: <strong>{fmtPct(history.net_change || 0)}</strong></span>
           </div>
         </>
       )}
@@ -210,37 +260,37 @@ function StockHistogram({ history, loading, stock }) {
   );
 }
 
-// ── Models tab ────────────────────────────────────────────────────────────────
+// ── Models tab ─────────────────────────────────────────────────────────────────
 
 const SIGNAL_TOOLTIPS = {
   name:               "Company name as reported in the 13F-HR filing",
   ticker:             "Exchange ticker symbol inferred from CUSIP or company name",
-  signal:             "ML conviction score ∈ [−1,+1]. +1 = model strongly predicts fund will grow this position; −1 = likely reduction or exit. tanh((P(increase)−P(decrease))×2.5) from GBC trained on 4-quarter 13F transitions",
+  signal:             "ML conviction score ∈ [−1,+1]. +1 = model strongly predicts fund will grow this position; −1 = likely reduction or exit. tanh((P(increase)−P(decrease))×2.5) from HistGBC trained on 4-quarter 13F transitions",
   current_weight_pct: "Current portfolio weight % from most recent 13F. 0% = predicted new-buy candidate not yet held.",
   sector:             "Sector ETF proxy (SMH=Semiconductors, XLK=Technology, XLF=Financials, XLV=Healthcare…)",
   momentum_3m:        "Stock 3-month price return % (yfinance weekly)",
   momentum_6m:        "Stock 6-month price return %",
   rel_momentum:       "3M return relative to SPY. Positive = outperforming the broad market.",
-  holding_streak:     "Consecutive quarters this fund has held the position. Longer = higher manager conviction.",
-  weight_trend:       "Average quarter-over-quarter weight change over last 4 filings. Positive = consistently adding.",
-  sector_flow_z:      "Z-score of sector ETF net flows vs. 52-week history. Above +1 = unusual institutional inflows.",
+  holding_streak:     "Consecutive quarters this fund has held the position.",
+  weight_trend:       "Average quarter-over-quarter weight change over last 4 filings.",
+  sector_flow_z:      "Z-score of sector ETF net flows vs 52-week history. Above +1 = unusual institutional inflows.",
   source:             "held = in current 13F portfolio; candidate = predicted new-buy from historical patterns",
   cusip:              "CUSIP — unique SEC identifier for the security",
 };
 
-function SignalsTable({ rows, loading, fundName }) {
-  if (loading) return <div className="card"><p>Running GBC model — may take 30–60 s on first load…</p></div>;
-  if (!rows || rows.length === 0) return <div className="card"><p>No signal data available for this fund yet.</p></div>;
+function SignalsTable({ rows, loading }) {
+  if (loading) return <div className="card"><p style={{ color: "#64748b" }}>Running model — may take 30–60 s on first load…</p></div>;
+  if (!rows || rows.length === 0) return <div className="card"><p style={{ color: "#64748b" }}>No signal data available yet.</p></div>;
 
   const cols = Object.entries(SIGNAL_TOOLTIPS);
 
   return (
     <div className="card">
-      <h2>{fundName} — Stock Signals</h2>
+      <h2>ML Stock Signals — All Funds</h2>
       <p className="meta">
-        GradientBoosting model on 4-quarter 13F transitions + yfinance price data. Signal ∈ [−1,+1].
-        <strong> Candidates</strong> (source=candidate) are predicted new buys not currently held.
+        HistGradientBoosting model trained on all tracked funds' 4-quarter 13F transitions + yfinance price data. Signal ∈ [−1, +1].
         Hover any column header for its definition.
+        <strong> Candidates</strong> (source = candidate) are predicted new buys not currently held by any fund.
       </p>
       <table>
         <thead>
@@ -262,23 +312,23 @@ function SignalsTable({ rows, loading, fundName }) {
         <tbody>
           {rows.map((r, i) => (
             <tr key={`${r.cusip || r.ticker || r.name}-${i}`}>
-              <td>{r.name || "-"}</td>
-              <td><strong>{r.ticker || "-"}</strong></td>
+              <td>{r.name || "—"}</td>
+              <td><strong>{r.ticker || "—"}</strong></td>
               <td>{fmtSignal(r.signal)}</td>
               <td>{fmtPct(r.current_weight_pct)}</td>
-              <td>{r.sector || "-"}</td>
-              <td>{r.momentum_3m != null ? fmtPct(r.momentum_3m) : "-"}</td>
-              <td>{r.momentum_6m != null ? fmtPct(r.momentum_6m) : "-"}</td>
-              <td>{r.rel_momentum != null ? fmtPct(r.rel_momentum) : "-"}</td>
-              <td>{r.holding_streak ?? "-"}</td>
-              <td>{r.weight_trend != null ? Number(r.weight_trend).toFixed(3) : "-"}</td>
-              <td>{r.sector_flow_z != null ? Number(r.sector_flow_z).toFixed(2) : "-"}</td>
+              <td>{r.sector || "—"}</td>
+              <td>{r.momentum_3m != null ? fmtPct(r.momentum_3m) : "—"}</td>
+              <td>{r.momentum_6m != null ? fmtPct(r.momentum_6m) : "—"}</td>
+              <td>{r.rel_momentum != null ? fmtPct(r.rel_momentum) : "—"}</td>
+              <td>{r.holding_streak ?? "—"}</td>
+              <td>{r.weight_trend != null ? Number(r.weight_trend).toFixed(3) : "—"}</td>
+              <td>{r.sector_flow_z != null ? Number(r.sector_flow_z).toFixed(2) : "—"}</td>
               <td>
                 <span className={`pill ${r.source === "candidate" ? "hold" : "buy"}`}>
                   {r.source || "held"}
                 </span>
               </td>
-              <td><code style={{ fontSize: "0.75em" }}>{r.cusip || "-"}</code></td>
+              <td style={{ color: "#94a3b8", fontSize: "0.75em" }}>{r.cusip || "—"}</td>
             </tr>
           ))}
         </tbody>
@@ -287,33 +337,29 @@ function SignalsTable({ rows, loading, fundName }) {
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const [funds, setFunds]           = useState([]);
   const [activeView, setActiveView] = useState("summary");
   const [fundDataCache, setFundDataCache] = useState({});
 
-  // Fund tab state
   const [holdingsRows, setHoldingsRows]   = useState([]);
   const [selectedStock, setSelectedStock] = useState(null);
   const [stockHistory, setStockHistory]   = useState(null);
   const [loadingStockHistory, setLoadingStockHistory] = useState(false);
   const [loadingTabData, setLoadingTabData] = useState(false);
 
-  // Models tab state
-  const [modelsCik, setModelsCik]       = useState("");
-  const [modelsData, setModelsData]     = useState({ data: [], columnsDefs: [] });
+  const [modelsData, setModelsData]       = useState({ data: [], columnsDefs: [] });
   const [loadingModels, setLoadingModels] = useState(false);
 
   const [loadingFunds, setLoadingFunds] = useState(true);
   const [error, setError]               = useState("");
 
-  const selectedFunds = useMemo(() => pickPriorityFunds(funds), [funds]);
+  const selectedFunds = useMemo(() => sortFunds(funds), [funds]);
   const activeFund    = useMemo(() => selectedFunds.find((f) => f.cik === activeView) || null, [selectedFunds, activeView]);
   const isFundView    = activeFund !== null;
 
-  // Load fund list
   useEffect(() => {
     async function load() {
       try {
@@ -331,22 +377,11 @@ export default function HomePage() {
     load();
   }, []);
 
-  // Default models CIK
-  useEffect(() => {
-    if (!selectedFunds.length) return;
-    if (!modelsCik || !selectedFunds.some((f) => f.cik === modelsCik)) {
-      const first = selectedFunds.find((f) => Number(f.num_positions || 0) > 0) || selectedFunds[0];
-      if (first) setModelsCik(first.cik);
-    }
-  }, [selectedFunds, modelsCik]);
-
-  // Reset stock selection when switching tabs
   useEffect(() => {
     setSelectedStock(null);
     setStockHistory(null);
   }, [activeView]);
 
-  // Guard invalid active view after funds load
   useEffect(() => {
     if (!selectedFunds.length) return;
     const valid = ["summary", "models"].includes(activeView) || selectedFunds.some((f) => f.cik === activeView);
@@ -356,7 +391,6 @@ export default function HomePage() {
     }
   }, [selectedFunds, activeView]);
 
-  // Load holdings for fund tab
   useEffect(() => {
     if (!activeView || !isFundView) return;
     const cached = fundDataCache[activeView];
@@ -379,21 +413,18 @@ export default function HomePage() {
     load();
   }, [activeView, isFundView, fundDataCache]);
 
-  // Load models signals
   useEffect(() => {
-    if (!modelsCik) return;
-    const key = `models:${modelsCik}`;
-    if (fundDataCache[key]) { setModelsData(fundDataCache[key]); return; }
+    if (fundDataCache["models"]) { setModelsData(fundDataCache["models"]); return; }
 
     async function load() {
       try {
         setLoadingModels(true);
-        const res  = await fetch(`api/recommendations?cik=${encodeURIComponent(modelsCik)}&top_n=30`, { cache: "no-store" });
+        const res  = await fetch("api/recommendations?top_n=50", { cache: "no-store" });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed");
         const result = { data: Array.isArray(data?.data) ? data.data : [], columnsDefs: data?.columnsDefs || [] };
         setModelsData(result);
-        setFundDataCache((prev) => ({ ...prev, [key]: result }));
+        setFundDataCache((prev) => ({ ...prev, models: result }));
       } catch (e) {
         setError(String(e));
       } finally {
@@ -401,7 +432,7 @@ export default function HomePage() {
       }
     }
     load();
-  }, [modelsCik, fundDataCache]);
+  }, [fundDataCache]);
 
   async function loadStockHistory(stock) {
     if (!stock || !isFundView) return;
@@ -423,109 +454,55 @@ export default function HomePage() {
     }
   }
 
-  const modelsFund = selectedFunds.find((f) => f.cik === modelsCik);
-
   return (
-    <main className="container">
-      <header>
-        <h1>13F Analyzer</h1>
-        <p>Institutional portfolio tracker — 13F filings + ML signals.</p>
-      </header>
+    <>
+      <TopNav
+        activeView={activeView}
+        setActiveView={setActiveView}
+        selectedFunds={selectedFunds}
+        isFundView={isFundView}
+      />
 
-      {error && <div className="error">{error}</div>}
+      <div className="page-body">
+        <Hero />
 
-      {loadingFunds ? <p>Loading dashboard…</p> : (
-        <>
-          {/* ── Tab bar ─────────────────────────────────────────────────────── */}
-          <div className="card tabs-card">
-            <div className="tabs">
-              {/* Summary */}
-              <button
-                type="button"
-                className={`tab-btn ${activeView === "summary" ? "active" : ""}`}
-                onClick={() => setActiveView("summary")}
-              >
-                Summary
-              </button>
+        <div className="container">
+          {error && <div className="error">{error}</div>}
 
-              {/* Models */}
-              <button
-                type="button"
-                className={`tab-btn ${activeView === "models" ? "active" : ""}`}
-                onClick={() => setActiveView("models")}
-              >
-                Models
-              </button>
-
-              {/* Funds dropdown */}
-              <div className="tab-dropdown-wrapper">
-                <button
-                  type="button"
-                  className={`tab-btn ${isFundView ? "active" : ""}`}
-                >
-                  Funds ▾
-                </button>
-                <div className="tab-dropdown">
-                  {selectedFunds.map((fund) => (
-                    <button
-                      key={fund.cik}
-                      type="button"
-                      className={`tab-dropdown-item ${activeView === fund.cik ? "active" : ""}`}
-                      onClick={() => setActiveView(fund.cik)}
-                    >
-                      {displayName(fund.name)}
-                      {Number(fund.num_positions || 0) === 0 ? " · empty" : ""}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Tab content ─────────────────────────────────────────────────── */}
-          {activeView === "summary" ? (
-            <>
-              <TrackedFunds funds={selectedFunds} onFundClick={(cik) => setActiveView(cik)} />
-            </>
-
-          ) : activeView === "models" ? (
-            <div>
-              <div className="card" style={{ paddingBottom: "8px" }}>
-                <h2>ML Stock Signals</h2>
-                <p className="meta">Select a fund. Hover any column header for its definition.</p>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "6px" }}>
-                  <label htmlFor="models-fund-select"><strong>Fund</strong></label>
-                  <select
-                    id="models-fund-select"
-                    value={modelsCik}
-                    onChange={(e) => setModelsCik(e.target.value)}
-                  >
-                    {selectedFunds.map((f) => (
-                      <option key={f.cik} value={f.cik}>{displayName(f.name)}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <SignalsTable rows={modelsData.data} loading={loadingModels} fundName={modelsFund?.name || modelsCik} />
-            </div>
-
-          ) : activeFund ? (
-            <>
-              <HoldingsTable
-                fund={activeFund}
-                rows={holdingsRows}
-                loading={loadingTabData}
-                onRowClick={loadStockHistory}
-                selectedStock={selectedStock}
-              />
-              <StockHistogram stock={selectedStock} history={stockHistory} loading={loadingStockHistory} />
-            </>
-
+          {loadingFunds ? (
+            <p style={{ color: "#64748b" }}>Loading dashboard…</p>
           ) : (
-            <div className="card"><p>No fund data available.</p></div>
+            <>
+              {activeView === "summary" && (
+                <TrackedFunds funds={selectedFunds} onFundClick={(cik) => setActiveView(cik)} />
+              )}
+
+              {activeView === "models" && (
+                <SignalsTable rows={modelsData.data} loading={loadingModels} />
+              )}
+
+              {isFundView && activeFund && (
+                <>
+                  <HoldingsTable
+                    fund={activeFund}
+                    rows={holdingsRows}
+                    loading={loadingTabData}
+                    onRowClick={loadStockHistory}
+                    selectedStock={selectedStock}
+                  />
+                  <StockHistogram stock={selectedStock} history={stockHistory} loading={loadingStockHistory} />
+                </>
+              )}
+
+              {!["summary", "models"].includes(activeView) && !activeFund && (
+                <div className="card"><p style={{ color: "#64748b" }}>No fund data available.</p></div>
+              )}
+            </>
           )}
-        </>
-      )}
-    </main>
+        </div>
+      </div>
+
+      <Footer />
+    </>
   );
 }

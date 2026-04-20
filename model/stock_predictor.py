@@ -1,7 +1,7 @@
 """
 Stock-level ML prediction engine.
 
-Trains a GradientBoostingClassifier on historical 13F position transitions
+Trains a HistGradientBoostingClassifier on historical 13F position transitions
 combined with sector ETF and individual stock price momentum features.
 
 Output: continuous signal ∈ [-1, +1]
@@ -17,8 +17,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import yfinance as yf
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.preprocessing import label_binarize
+from sklearn.ensemble import HistGradientBoostingClassifier
 
 import config
 from features.sector_map import name_to_sector
@@ -304,12 +303,12 @@ def _build_training_data(
     return X, y
 
 
-def _train(X: pd.DataFrame, y: pd.Series) -> Optional[GradientBoostingClassifier]:
+def _train(X: pd.DataFrame, y: pd.Series) -> Optional[HistGradientBoostingClassifier]:
     if X.empty or len(y) < 30:
         return None
-    clf = GradientBoostingClassifier(
-        n_estimators=300, max_depth=4, learning_rate=0.05,
-        subsample=0.8, min_samples_leaf=5, random_state=42,
+    clf = HistGradientBoostingClassifier(
+        max_iter=100, max_depth=4, learning_rate=0.05,
+        min_samples_leaf=20, random_state=42,
     )
     clf.fit(X, y)
     return clf
@@ -324,7 +323,7 @@ def _holdings_signature(holdings: pd.DataFrame, feature_store: pd.DataFrame) -> 
     return (len(holdings), latest_period, latest_filing, fund_count, feature_shape, feature_stamp)
 
 
-def _get_or_train_model(holdings: pd.DataFrame, feature_store: pd.DataFrame) -> Optional[GradientBoostingClassifier]:
+def _get_or_train_model(holdings: pd.DataFrame, feature_store: pd.DataFrame) -> Optional[HistGradientBoostingClassifier]:
     signature = _holdings_signature(holdings, feature_store)
     if _MODEL_CACHE["signature"] == signature:
         return _MODEL_CACHE["model"]  # type: ignore[return-value]
@@ -509,7 +508,7 @@ def _predict_new_buys(
     cik: str,
     holdings: pd.DataFrame,
     feature_store: pd.DataFrame,
-    clf: Optional[GradientBoostingClassifier],
+    clf: Optional[HistGradientBoostingClassifier],
     exclude_cusips: set[str],
     existing_price_map: dict,
     m_feats: dict,
@@ -569,7 +568,9 @@ def _predict_new_buys(
                 avg_sector_flow = float(feature_store[col].iloc[-1])
                 break
 
-    cand_rows = []
+    # Build metadata and feature rows together, then batch-predict
+    meta_rows = []
+    feat_rows = []
     for _, row in candidates.iterrows():
         name   = str(row.get("name", ""))
         cusip  = str(row.get("cusip", ""))
@@ -577,42 +578,50 @@ def _predict_new_buys(
         sector = name_to_sector(name)
         s_feats = _sector_features(sector, feature_store)
         pf = price_map.get(ticker, {})
-
-        feat_row = {
-            "holding_streak": 0,
-            "weight_latest":  0.0,
-            "weight_change_1q": 0.0,
-            "weight_change_2q": 0.0,
-            "weight_trend":   0.0,
-            "port_pct_rank":  0.0,
+        meta_rows.append({
+            "cusip": cusip, "name": name, "ticker": ticker, "sector": sector,
+            "s_feats": s_feats, "pf": pf,
+        })
+        feat_rows.append({
+            "holding_streak": 0, "weight_latest": 0.0,
+            "weight_change_1q": 0.0, "weight_change_2q": 0.0,
+            "weight_trend": 0.0, "port_pct_rank": 0.0,
             **s_feats, **m_feats,
-            "stock_ret_3m":    pf.get("ret_3m", 0.0),
-            "stock_ret_6m":    pf.get("ret_6m", 0.0),
-            "stock_vol_3m":    pf.get("vol_3m", 0.0),
+            "stock_ret_3m":     pf.get("ret_3m", 0.0),
+            "stock_ret_6m":     pf.get("ret_6m", 0.0),
+            "stock_vol_3m":     pf.get("vol_3m", 0.0),
             "stock_rel_ret_3m": pf.get("rel_ret_3m", 0.0),
-        }
+        })
 
-        if clf is not None:
-            X = pd.DataFrame([feat_row])[_FEATURE_COLS].fillna(0.0)
-            proba = clf.predict_proba(X)[0]
-            class_order = list(clf.classes_)
-            idx_dec = class_order.index("decrease") if "decrease" in class_order else -1
-            idx_inc = class_order.index("increase") if "increase" in class_order else -1
-            p_inc = float(proba[idx_inc]) if idx_inc >= 0 else 0.33
-            p_dec = float(proba[idx_dec]) if idx_dec >= 0 else 0.33
-            raw = (p_inc - p_dec) * 2.5
-            signal = round(float(np.tanh(raw)), 3)
+    if not feat_rows:
+        return []
+
+    if clf is not None:
+        X_all = pd.DataFrame(feat_rows)[_FEATURE_COLS].fillna(0.0)
+        probas = clf.predict_proba(X_all)
+        class_order = list(clf.classes_)
+        idx_dec = class_order.index("decrease") if "decrease" in class_order else -1
+        idx_inc = class_order.index("increase") if "increase" in class_order else -1
+    else:
+        probas = None
+
+    cand_rows = []
+    for i, meta in enumerate(meta_rows):
+        pf = meta["pf"]
+        s_feats = meta["s_feats"]
+        if probas is not None:
+            p_inc = float(probas[i, idx_inc]) if idx_inc >= 0 else 0.33
+            p_dec = float(probas[i, idx_dec]) if idx_dec >= 0 else 0.33
+            signal = round(float(np.tanh((p_inc - p_dec) * 2.5)), 3)
         else:
-            s = (pf.get("ret_3m", 0.0) * 2.0 + s_feats.get("sector_flow_z", 0.0) * 0.5)
-            signal = round(float(np.tanh(s)), 3)
+            signal = round(float(np.tanh(pf.get("ret_3m", 0.0) * 2.0 + s_feats.get("sector_flow_z", 0.0) * 0.5)), 3)
 
-        # Only include candidates with positive signal (we're looking for buys)
         if signal > 0.05:
             cand_rows.append({
-                "cusip":              cusip,
-                "name":               name,
-                "ticker":             ticker,
-                "sector":             sector,
+                "cusip":              meta["cusip"],
+                "name":               meta["name"],
+                "ticker":             meta["ticker"],
+                "sector":             meta["sector"],
                 "current_weight_pct": 0.0,
                 "holding_streak":     0,
                 "weight_trend":       0.0,
@@ -624,7 +633,6 @@ def _predict_new_buys(
                 "signal":             signal,
             })
 
-    # Deduplicate candidates by ticker, keeping highest signal per ticker
     seen: set[str] = set()
     deduped: list[dict] = []
     for r in sorted(cand_rows, key=lambda x: -x["signal"]):

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: 13f-analyzer-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/serve.py --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: EDGAR_USER_AGENT
+        sync: false
+      - key: FRED_API_KEY
+        sync: false
+      - key: TARGET_CIKS
+        sync: false
+      - key: PROXY_ETFS
+        sync: false
+    healthCheckPath: /
