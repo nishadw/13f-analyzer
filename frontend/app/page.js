@@ -174,38 +174,98 @@ function TrackedFunds({ funds, onFundClick }) {
   );
 }
 
-// ── Fund holdings ──────────────────────────────────────────────────────────────
+// ── Fund holdings with inline expandable histogram ────────────────────────────
 
-function HoldingsTable({ fund, rows, loading, onRowClick, selectedStock }) {
+function InlineHistogram({ history, loading }) {
+  const values  = Array.isArray(history?.values)  ? history.values  : [];
+  const periods = Array.isArray(history?.periods) ? history.periods : [];
+  const maxVal  = Math.max(1, ...values.map((v) => Number(v || 0)));
+
+  if (loading) return <p style={{ color: "#64748b", padding: "12px 0" }}>Loading history…</p>;
+  if (!values.length) return <p style={{ color: "#94a3b8", padding: "12px 0" }}>No history data.</p>;
+
+  return (
+    <div style={{ padding: "16px 8px 8px" }}>
+      <div className="histogram-shell">
+        <div className="histogram-boxes">
+          {values.map((value, i) => {
+            const heightPct = Math.max(14, Math.round((Number(value || 0) / maxVal) * 100));
+            const delta = i === 0 ? 0 : Number((value - values[i - 1]).toFixed(2));
+            return (
+              <div className="histogram-box-wrap" key={`${periods[i] || i}-${value}`}>
+                <div className="histogram-label">{periods[i] || `Q${i + 1}`}</div>
+                <div className="histogram-box-track">
+                  <div className="histogram-box" style={{ height: `${heightPct}%` }}>
+                    <span>{fmtPct(value)}</span>
+                  </div>
+                </div>
+                <div className={`histogram-change ${delta >= 0 ? "positive" : "negative"}`}>
+                  {i === 0 ? "start" : `${delta >= 0 ? "+" : ""}${fmtPct(delta)}`}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="history-summary">
+        <span>Increase total: <strong>{fmtPct(history.increase_total || 0)}</strong></span>
+        <span>Decrease total: <strong>{fmtPct(history.decrease_total || 0)}</strong></span>
+        <span>Net change: <strong>{fmtPct(history.net_change || 0)}</strong></span>
+      </div>
+    </div>
+  );
+}
+
+function HoldingsTable({ fund, rows, loading, onRowClick, expandedCusip, historyMap, loadingCusip }) {
+  const COLS = 9; // # of td columns including the triangle column
   return (
     <div className="card">
       <h2>{displayName(fund.name)} — Holdings</h2>
-      <p className="meta">CIK {fmtCik(fund.cik)} · Latest filing {fund.latest_period || "N/A"}</p>
+      <p className="meta">CIK {fmtCik(fund.cik)} · Latest filing {fund.latest_period || "N/A"} · Click a row to expand position history</p>
       {loading ? <p>Loading holdings…</p> : rows.length === 0 ? <p>No holdings data available.</p> : (
         <table>
           <thead>
             <tr>
+              <th style={{ width: 24 }}></th>
               <th>#</th><th>Company</th><th>Ticker</th><th>CUSIP</th>
               <th>Weight</th><th>Value</th><th>Shares</th><th>Sector</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr
-                key={`${fund.cik}-${r.rank}-${r.cusip}`}
-                className={`clickable-row ${selectedStock?.cusip === r.cusip ? "selected" : ""}`}
-                onClick={() => onRowClick?.(r)}
-              >
-                <td style={{ color: "#94a3b8" }}>{r.rank}</td>
-                <td>{r.name}</td>
-                <td><strong>{r.ticker || "—"}</strong></td>
-                <td style={{ color: "#94a3b8", fontSize: "0.78em" }}>{r.cusip || "—"}</td>
-                <td>{fmtPct(r.weight_pct)}</td>
-                <td>{fmtMoney(r.value_usd_mm)}</td>
-                <td>{Number(r.shares || 0).toLocaleString()}</td>
-                <td>{r.sector || "—"}</td>
-              </tr>
-            ))}
+            {rows.map((r) => {
+              const isOpen = expandedCusip === r.cusip;
+              return (
+                <>
+                  <tr
+                    key={`${fund.cik}-${r.rank}-${r.cusip}`}
+                    className={`clickable-row ${isOpen ? "selected" : ""}`}
+                    onClick={() => onRowClick?.(r)}
+                  >
+                    <td style={{ color: "#94a3b8", textAlign: "center", fontSize: "0.7em" }}>
+                      {isOpen ? "▼" : "▶"}
+                    </td>
+                    <td style={{ color: "#94a3b8" }}>{r.rank}</td>
+                    <td>{r.name}</td>
+                    <td><strong>{r.ticker || "—"}</strong></td>
+                    <td style={{ color: "#94a3b8", fontSize: "0.78em" }}>{r.cusip || "—"}</td>
+                    <td>{fmtPct(r.weight_pct)}</td>
+                    <td>{fmtMoney(r.value_usd_mm)}</td>
+                    <td>{Number(r.shares || 0).toLocaleString()}</td>
+                    <td>{r.sector || "—"}</td>
+                  </tr>
+                  {isOpen && (
+                    <tr key={`hist-${r.cusip}`} className="history-inline-row">
+                      <td colSpan={COLS} style={{ padding: 0, background: "#f8fafc", borderBottom: "2px solid #e0f2fe" }}>
+                        <InlineHistogram
+                          history={historyMap?.[r.cusip]}
+                          loading={loadingCusip === r.cusip}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </>
+              );
+            })}
           </tbody>
         </table>
       )}
@@ -213,124 +273,134 @@ function HoldingsTable({ fund, rows, loading, onRowClick, selectedStock }) {
   );
 }
 
-function StockHistogram({ history, loading, stock }) {
-  const values  = Array.isArray(history?.values)  ? history.values  : [];
-  const periods = Array.isArray(history?.periods) ? history.periods : [];
-  const maxVal  = Math.max(1, ...values.map((v) => Number(v || 0)));
-
-  return (
-    <div className="card history-card">
-      <h2>Position Size History</h2>
-      <p className="meta">
-        {stock ? `${stock.name || "Selected"}${stock.ticker ? ` (${stock.ticker})` : ""}` : "Click any holding row to see its weight across the last 4 filings."}
-      </p>
-      {loading ? <p>Loading…</p> : !history || values.length === 0 ? (
-        <p style={{ color: "#94a3b8" }}>Click any row above to inspect its history.</p>
-      ) : (
-        <>
-          <div className="histogram-shell">
-            <div className="histogram-boxes">
-              {values.map((value, i) => {
-                const heightPct = Math.max(14, Math.round((Number(value || 0) / maxVal) * 100));
-                const delta = i === 0 ? 0 : Number((value - values[i - 1]).toFixed(2));
-                return (
-                  <div className="histogram-box-wrap" key={`${periods[i] || i}-${value}`}>
-                    <div className="histogram-label">{periods[i] || `Q${i + 1}`}</div>
-                    <div className="histogram-box-track">
-                      <div className="histogram-box" style={{ height: `${heightPct}%` }}>
-                        <span>{fmtPct(value)}</span>
-                      </div>
-                    </div>
-                    <div className={`histogram-change ${delta >= 0 ? "positive" : "negative"}`}>
-                      {i === 0 ? "start" : `${delta >= 0 ? "+" : ""}${fmtPct(delta)}`}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="history-summary">
-            <span>Increase total: <strong>{fmtPct(history.increase_total || 0)}</strong></span>
-            <span>Decrease total: <strong>{fmtPct(history.decrease_total || 0)}</strong></span>
-            <span>Net change: <strong>{fmtPct(history.net_change || 0)}</strong></span>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 // ── Models tab ─────────────────────────────────────────────────────────────────
 
-const SIGNAL_TOOLTIPS = {
-  name:               "Company name as reported in the 13F-HR filing",
-  ticker:             "Exchange ticker symbol inferred from CUSIP or company name",
-  signal:             "ML conviction score ∈ [−1,+1]. +1 = model strongly predicts fund will grow this position; −1 = likely reduction or exit. tanh((P(increase)−P(decrease))×2.5) from HistGBC trained on 4-quarter 13F transitions",
-  current_weight_pct: "Current portfolio weight % from most recent 13F. 0% = predicted new-buy candidate not yet held.",
-  sector:             "Sector ETF proxy (SMH=Semiconductors, XLK=Technology, XLF=Financials, XLV=Healthcare…)",
-  momentum_3m:        "Stock 3-month price return % (yfinance weekly)",
-  momentum_6m:        "Stock 6-month price return %",
-  rel_momentum:       "3M return relative to SPY. Positive = outperforming the broad market.",
-  holding_streak:     "Consecutive quarters this fund has held the position.",
-  weight_trend:       "Average quarter-over-quarter weight change over last 4 filings.",
-  sector_flow_z:      "Z-score of sector ETF net flows vs 52-week history. Above +1 = unusual institutional inflows.",
-  source:             "held = in current 13F portfolio; candidate = predicted new-buy from historical patterns",
-  cusip:              "CUSIP — unique SEC identifier for the security",
-};
+const DEFAULT_MODEL_COLUMNS = [
+  { field: "asset", headerName: "Asset", headerTooltip: "Security name from the 13F filing." },
+  { field: "ticker", headerName: "Ticker", headerTooltip: "Exchange ticker inferred from CUSIP/company mapping." },
+  { field: "sector", headerName: "Sector", headerTooltip: "Mapped sector proxy used by the model." },
+  { field: "status", headerName: "Status", headerTooltip: "Action badge: NEW POSITION, ACCUMULATING, TRIMMING, EXITED." },
+  { field: "portfolio_count", headerName: "In Portfolios", headerTooltip: "How many tracked funds currently hold this stock. Click row for full holder details." },
+  { field: "thesis_conviction", headerName: "Thesis Conviction", headerTooltip: "0 to 1 score for strategy alignment strength." },
+  { field: "top_tft_driver", headerName: "Top TFT Driver", headerTooltip: "The #1 reason the model produced this prediction." },
+  { field: "flow_signal", headerName: "Flow Signal", headerTooltip: "Institutional flow pressure regime from z-score behavior." },
+];
 
-function SignalsTable({ rows, loading }) {
+function renderModelCell(row, field) {
+  switch (field) {
+    case "asset":
+      return row.asset || row.name || "—";
+    case "ticker":
+      return <strong>{row.ticker || "—"}</strong>;
+    case "pred_wt_pct":
+    case "last_13f_wt_pct":
+      return row[field] != null ? fmtPct(row[field]) : "—";
+    case "weight_delta_bps": {
+      const n = Number(row.weight_delta_bps || 0);
+      return `${n >= 0 ? "+" : ""}${n.toFixed(0)}`;
+    }
+    case "status": {
+      const v = String(row.status || "ACCUMULATING");
+      const cls = v === "NEW POSITION" || v === "ACCUMULATING" ? "buy" : "sell";
+      return <span className={`pill ${cls}`}>{v}</span>;
+    }
+    case "thesis_conviction":
+      return row.thesis_conviction != null ? Number(row.thesis_conviction).toFixed(3) : "—";
+    case "top_tft_driver":
+      return row.top_tft_driver || "—";
+    case "flow_signal": {
+      const v = String(row.flow_signal || "Neutral");
+      const cls = v === "Inflow" ? "buy" : v === "Outflow" ? "sell" : "hold";
+      return <span className={`pill ${cls}`}>{v}</span>;
+    }
+    case "sector":
+      return row.sector || "—";
+    case "portfolio_count":
+      return Number(row.portfolio_count || 0).toLocaleString();
+    default:
+      return row[field] != null && row[field] !== "" ? String(row[field]) : "—";
+  }
+}
+
+function SignalsTable({ rows, loading, columnsDefs }) {
+  const [expanded, setExpanded] = useState(null);
+
   if (loading) return <div className="card"><p style={{ color: "#64748b" }}>Running model — may take 30–60 s on first load…</p></div>;
   if (!rows || rows.length === 0) return <div className="card"><p style={{ color: "#64748b" }}>No signal data available yet.</p></div>;
 
-  const cols = Object.entries(SIGNAL_TOOLTIPS);
+  const cols = Array.isArray(columnsDefs) && columnsDefs.length > 0 ? columnsDefs : DEFAULT_MODEL_COLUMNS;
 
   return (
     <div className="card">
       <h2>ML Stock Signals — All Funds</h2>
       <p className="meta">
-        HistGradientBoosting model trained on all tracked funds' 4-quarter 13F transitions + yfinance price data. Signal ∈ [−1, +1].
+        HistGradientBoosting model trained on all tracked funds' 4-quarter 13F transitions + yfinance price data.
         Hover any column header for its definition.
-        <strong> Candidates</strong> (source = candidate) are predicted new buys not currently held by any fund.
+        <strong> Thesis Conviction</strong> is normalized to a 0..1 strength score.
+        <br />
+        New idea pipeline (next step): GraphRAG entity extraction + flow anomaly scan + zero-weight initialization for net-new names.
       </p>
       <table>
         <thead>
           <tr>
-            {cols.map(([col, tip]) => (
-              <th key={col} title={tip}>
-                {col === "current_weight_pct" ? "Weight %" :
-                 col === "momentum_3m"        ? "Mom 3M %" :
-                 col === "momentum_6m"        ? "Mom 6M %" :
-                 col === "rel_momentum"       ? "Rel Mom %" :
-                 col === "holding_streak"     ? "Qtrs Held" :
-                 col === "weight_trend"       ? "Wt Trend" :
-                 col === "sector_flow_z"      ? "Sector Flow Z" :
-                 col.charAt(0).toUpperCase() + col.slice(1)}
+            {cols.map((col) => (
+              <th key={col.field} title={col.headerTooltip || ""}>
+                {col.headerName || col.field}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => (
-            <tr key={`${r.cusip || r.ticker || r.name}-${i}`}>
-              <td>{r.name || "—"}</td>
-              <td><strong>{r.ticker || "—"}</strong></td>
-              <td>{fmtSignal(r.signal)}</td>
-              <td>{fmtPct(r.current_weight_pct)}</td>
-              <td>{r.sector || "—"}</td>
-              <td>{r.momentum_3m != null ? fmtPct(r.momentum_3m) : "—"}</td>
-              <td>{r.momentum_6m != null ? fmtPct(r.momentum_6m) : "—"}</td>
-              <td>{r.rel_momentum != null ? fmtPct(r.rel_momentum) : "—"}</td>
-              <td>{r.holding_streak ?? "—"}</td>
-              <td>{r.weight_trend != null ? Number(r.weight_trend).toFixed(3) : "—"}</td>
-              <td>{r.sector_flow_z != null ? Number(r.sector_flow_z).toFixed(2) : "—"}</td>
-              <td>
-                <span className={`pill ${r.source === "candidate" ? "hold" : "buy"}`}>
-                  {r.source || "held"}
-                </span>
-              </td>
-              <td style={{ color: "#94a3b8", fontSize: "0.75em" }}>{r.cusip || "—"}</td>
-            </tr>
-          ))}
+          {rows.map((r, i) => {
+            const key = `${r.cusip || r.ticker || r.name}-${i}`;
+            const isOpen = expanded === key;
+            const positions = Array.isArray(r.portfolio_positions) ? r.portfolio_positions : [];
+            return [
+                <tr key={key} className={`clickable-row ${isOpen ? "selected" : ""}`} onClick={() => setExpanded(isOpen ? null : key)}>
+                  {cols.map((col) => (
+                    <td key={`${col.field}-${key}`}>
+                      {renderModelCell(r, col.field)}
+                    </td>
+                  ))}
+                </tr>,
+                isOpen && (
+                  <tr key={`details-${key}`} className="history-inline-row">
+                    <td colSpan={cols.length} style={{ padding: 0, background: "#f8fafc", borderBottom: "2px solid #e0f2fe" }}>
+                      <div style={{ padding: "12px 14px" }}>
+                        <div style={{ display: "flex", gap: 18, flexWrap: "wrap", marginBottom: 10 }}>
+                          <span>Pred Wt: <strong>{fmtPct(r.pred_wt_pct)}</strong></span>
+                          <span>Wt Δ: <strong>{`${Number(r.weight_delta_bps || 0) >= 0 ? "+" : ""}${Number(r.weight_delta_bps || 0).toFixed(0)} bps`}</strong></span>
+                          <span>Last 13F Wt: <strong>{fmtPct(r.last_13f_wt_pct)}</strong></span>
+                        </div>
+                        {!positions.length ? (
+                          <p style={{ color: "#64748b", margin: 0 }}>Not currently present in tracked portfolios.</p>
+                        ) : (
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Portfolio</th><th>CIK</th><th>Weight %</th><th>Shares</th><th>Value (MM)</th><th>Reported Implied Price</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {positions.map((p, idx) => (
+                                <tr key={`${key}-p-${idx}`}>
+                                  <td>{p.portfolio || "—"}</td>
+                                  <td>{fmtCik(p.cik)}</td>
+                                  <td>{fmtPct(p.weight_pct)}</td>
+                                  <td>{Number(p.shares || 0).toLocaleString()}</td>
+                                  <td>{`$${Number(p.value_usd_mm || 0).toFixed(2)}M`}</td>
+                                  <td>{p.reported_implied_price ? `$${Number(p.reported_implied_price).toFixed(2)}` : "—"}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ),
+            ];
+          })}
         </tbody>
       </table>
     </div>
@@ -344,10 +414,10 @@ export default function HomePage() {
   const [activeView, setActiveView] = useState("summary");
   const [fundDataCache, setFundDataCache] = useState({});
 
-  const [holdingsRows, setHoldingsRows]   = useState([]);
-  const [selectedStock, setSelectedStock] = useState(null);
-  const [stockHistory, setStockHistory]   = useState(null);
-  const [loadingStockHistory, setLoadingStockHistory] = useState(false);
+  const [holdingsRows, setHoldingsRows]     = useState([]);
+  const [expandedCusip, setExpandedCusip]   = useState(null);
+  const [historyMap, setHistoryMap]         = useState({});
+  const [loadingCusip, setLoadingCusip]     = useState(null);
   const [loadingTabData, setLoadingTabData] = useState(false);
 
   const [modelsData, setModelsData]       = useState({ data: [], columnsDefs: [] });
@@ -378,8 +448,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setSelectedStock(null);
-    setStockHistory(null);
+    setExpandedCusip(null);
   }, [activeView]);
 
   useEffect(() => {
@@ -419,7 +488,7 @@ export default function HomePage() {
     async function load() {
       try {
         setLoadingModels(true);
-        const res  = await fetch("api/recommendations?top_n=50", { cache: "no-store" });
+        const res  = await fetch("api/recommendations?top_n=20", { cache: "no-store" });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed");
         const result = { data: Array.isArray(data?.data) ? data.data : [], columnsDefs: data?.columnsDefs || [] };
@@ -436,21 +505,26 @@ export default function HomePage() {
 
   async function loadStockHistory(stock) {
     if (!stock || !isFundView) return;
-    const key = `${activeView}:${String(stock.cusip || stock.ticker || stock.name || "").toUpperCase()}`;
-    if (fundDataCache[key]) { setSelectedStock(stock); setStockHistory(fundDataCache[key]); return; }
+    const cusip = String(stock.cusip || "").toUpperCase();
+    if (!cusip) return;
+
+    // toggle closed
+    if (expandedCusip === cusip) { setExpandedCusip(null); return; }
+
+    setExpandedCusip(cusip);
+    if (historyMap[cusip]) return; // already cached
+
     try {
-      setLoadingStockHistory(true);
-      setSelectedStock(stock);
+      setLoadingCusip(cusip);
       const params = new URLSearchParams({ cik: activeView, cusip: stock.cusip || "", name: stock.name || "", ticker: stock.ticker || "" });
       const res  = await fetch(`api/stock-history?${params}`, { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      setStockHistory(data);
-      setFundDataCache((prev) => ({ ...prev, [key]: data }));
+      setHistoryMap((prev) => ({ ...prev, [cusip]: data }));
     } catch (e) {
       setError(String(e));
     } finally {
-      setLoadingStockHistory(false);
+      setLoadingCusip(null);
     }
   }
 
@@ -478,7 +552,7 @@ export default function HomePage() {
               )}
 
               {activeView === "models" && (
-                <SignalsTable rows={modelsData.data} loading={loadingModels} />
+                <SignalsTable rows={modelsData.data} loading={loadingModels} columnsDefs={modelsData.columnsDefs} />
               )}
 
               {isFundView && activeFund && (
@@ -488,9 +562,10 @@ export default function HomePage() {
                     rows={holdingsRows}
                     loading={loadingTabData}
                     onRowClick={loadStockHistory}
-                    selectedStock={selectedStock}
+                    expandedCusip={expandedCusip}
+                    historyMap={historyMap}
+                    loadingCusip={loadingCusip}
                   />
-                  <StockHistogram stock={selectedStock} history={stockHistory} loading={loadingStockHistory} />
                 </>
               )}
 

@@ -106,6 +106,14 @@ def run_full_ingestion() -> dict:
     holdings = run_edgar_ingestion()
     proxy = run_market_ingestion()
     macro = run_fred_ingestion()
+
+    # Keep prediction artifacts warm: refresh only when period changes.
+    try:
+        from scripts.refresh_signals import refresh as refresh_signals_cache
+        refresh_signals_cache(top_n=50, force=False)
+    except Exception as e:
+        console.print(f"[yellow]Signals cache refresh skipped:[/yellow] {e}")
+
     console.rule("[bold green]Ingestion Complete[/bold green]")
     return {"holdings": holdings, "proxy": proxy, "macro": macro}
 

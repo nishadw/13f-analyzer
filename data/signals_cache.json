@@ -1,0 +1,1468 @@
+{
+  "generated_at": "2026-04-20T06:27:07.117127+00:00",
+  "latest_period": "2025-12-31",
+  "backtest": {
+    "status": "ok",
+    "n_test_periods": 4,
+    "period_results": [
+      {
+        "test_period": "2025-03-31",
+        "n_rows": 28513,
+        "mae_pp": 0.0247,
+        "rmse_pp": 0.6544,
+        "directional_accuracy": 0.873,
+        "corr": 0.5172
+      },
+      {
+        "test_period": "2025-06-30",
+        "n_rows": 28683,
+        "mae_pp": 0.0175,
+        "rmse_pp": 0.1273,
+        "directional_accuracy": 0.8668,
+        "corr": 0.1176
+      },
+      {
+        "test_period": "2025-09-30",
+        "n_rows": 26769,
+        "mae_pp": 0.0185,
+        "rmse_pp": 0.1589,
+        "directional_accuracy": 0.8687,
+        "corr": 0.1439
+      },
+      {
+        "test_period": "2025-12-31",
+        "n_rows": 25747,
+        "mae_pp": 0.0175,
+        "rmse_pp": 0.163,
+        "directional_accuracy": 0.8849,
+        "corr": 0.1788
+      }
+    ],
+    "summary": {
+      "avg_mae_pp": 0.0196,
+      "avg_rmse_pp": 0.2759,
+      "avg_directional_accuracy": 0.8734,
+      "avg_corr": 0.2394
+    }
+  },
+  "data": [
+    {
+      "cusip": "76131D103",
+      "name": "RESTAURANT BRANDS INTL INC",
+      "ticker": "QSR",
+      "sector": "Other",
+      "current_weight_pct": 10.05,
+      "holding_streak": 4,
+      "weight_trend": -0.0059,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 15.51,
+      "momentum_6m": 18.24,
+      "rel_momentum": 12.2,
+      "source": "held",
+      "pred_delta_pp": -2.0172,
+      "signal": -1.0,
+      "asset": "RESTAURANT BRANDS INTL INC",
+      "portfolio": "AQR, Bridgewater (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 10.0485,
+          "shares": 22866773,
+          "value_usd_mm": 1560199.922,
+          "reported_implied_price": 68230.0
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0107,
+          "shares": 286960,
+          "value_usd_mm": 19582.232,
+          "reported_implied_price": 68240.2844
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0199,
+          "shares": 80173,
+          "value_usd_mm": 5470.419,
+          "reported_implied_price": 68232.6843
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0022,
+          "shares": 60256,
+          "value_usd_mm": 4111.347,
+          "reported_implied_price": 68231.3297
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 8.03,
+      "weight_delta_bps": -202,
+      "status": "TRIMMING",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Momentum 3M (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 10.05
+    },
+    {
+      "cusip": "43300A203",
+      "name": "HILTON WORLDWIDE HLDGS INC",
+      "ticker": "HLT",
+      "sector": "Other",
+      "current_weight_pct": 5.6,
+      "holding_streak": 4,
+      "weight_trend": -1.8526,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 14.45,
+      "momentum_6m": 27.49,
+      "rel_momentum": 11.14,
+      "source": "held",
+      "pred_delta_pp": -2.9779,
+      "signal": -1.0,
+      "asset": "HILTON WORLDWIDE HLDGS INC",
+      "portfolio": "AQR, Bridgewater (+5)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 5.6031,
+          "shares": 3028664,
+          "value_usd_mm": 869983.734,
+          "reported_implied_price": 287250.0
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.1944,
+          "shares": 348080,
+          "value_usd_mm": 99985.98,
+          "reported_implied_price": 287250.0
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.1316,
+          "shares": 324798,
+          "value_usd_mm": 93298.226,
+          "reported_implied_price": 287250.0015
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.144,
+          "shares": 323060,
+          "value_usd_mm": 92798.985,
+          "reported_implied_price": 287250.0
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0455,
+          "shares": 43390,
+          "value_usd_mm": 12463.778,
+          "reported_implied_price": 287250.0115
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0025,
+          "shares": 15990,
+          "value_usd_mm": 4593.128,
+          "reported_implied_price": 287250.0313
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0015,
+          "shares": 9962,
+          "value_usd_mm": 2861.585,
+          "reported_implied_price": 287250.0502
+        }
+      ],
+      "portfolio_count": 7,
+      "pred_wt_pct": 2.62,
+      "weight_delta_bps": -298,
+      "status": "TRIMMING",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Momentum 3M (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 5.6
+    },
+    {
+      "cusip": "15135B101",
+      "name": "CENTENE CORP DEL",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 0.66,
+      "holding_streak": 4,
+      "weight_trend": 0.1623,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -3.2037,
+      "signal": -1.0,
+      "asset": "CENTENE CORP DEL",
+      "portfolio": "AQR, Bridgewater (+4)",
+      "portfolio_positions": [
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.6627,
+          "shares": 30699655,
+          "value_usd_mm": 1263290.812,
+          "reported_implied_price": 41150.0003
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.087,
+          "shares": 3857579,
+          "value_usd_mm": 158739.376,
+          "reported_implied_price": 41150.0
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.1388,
+          "shares": 2390920,
+          "value_usd_mm": 98386.358,
+          "reported_implied_price": 41150.0
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.1758,
+          "shares": 2196692,
+          "value_usd_mm": 90393.876,
+          "reported_implied_price": 41150.0001
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.0672,
+          "shares": 1052112,
+          "value_usd_mm": 43294.409,
+          "reported_implied_price": 41150.0002
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0142,
+          "shares": 94532,
+          "value_usd_mm": 3889.992,
+          "reported_implied_price": 41150.0021
+        }
+      ],
+      "portfolio_count": 6,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -66,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 0.66
+    },
+    {
+      "cusip": "91307C102",
+      "name": "UNITED THERAPEUTICS CORP DEL",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 1.44,
+      "holding_streak": 4,
+      "weight_trend": 0.4428,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -3.0741,
+      "signal": -1.0,
+      "asset": "UNITED THERAPEUTICS CORP DEL",
+      "portfolio": "AQR, Bridgewater (+3)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 1.4432,
+          "shares": 1909259,
+          "value_usd_mm": 930286.448,
+          "reported_implied_price": 487250.0001
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.3194,
+          "shares": 1249761,
+          "value_usd_mm": 608945.828,
+          "reported_implied_price": 487249.8246
+        },
+        {
+          "cik": "1603466",
+          "portfolio": "Point72",
+          "weight_pct": 0.1014,
+          "shares": 186164,
+          "value_usd_mm": 90708.409,
+          "reported_implied_price": 487250.0
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.1148,
+          "shares": 64595,
+          "value_usd_mm": 31473.914,
+          "reported_implied_price": 487250.0039
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.0111,
+          "shares": 16082,
+          "value_usd_mm": 7835.955,
+          "reported_implied_price": 487250.0311
+        }
+      ],
+      "portfolio_count": 5,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -144,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 1.44
+    },
+    {
+      "cusip": "595112103",
+      "name": "MICRON TECHNOLOGY INC",
+      "ticker": "MU",
+      "sector": "SMH",
+      "current_weight_pct": 1.33,
+      "holding_streak": 4,
+      "weight_trend": 0.3883,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 13.91,
+      "momentum_6m": 107.95,
+      "rel_momentum": 10.6,
+      "source": "held",
+      "pred_delta_pp": -2.7359,
+      "signal": -1.0,
+      "asset": "MICRON TECHNOLOGY INC",
+      "portfolio": "AQR, Bridgewater (+3)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 1.3332,
+          "shares": 3011143,
+          "value_usd_mm": 859411.122,
+          "reported_implied_price": 285410.2651
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.294,
+          "shares": 2331800,
+          "value_usd_mm": 665519.038,
+          "reported_implied_price": 285410.0
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.1683,
+          "shares": 1075782,
+          "value_usd_mm": 307038.941,
+          "reported_implied_price": 285410.0004
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.926,
+          "shares": 889640,
+          "value_usd_mm": 253912.152,
+          "reported_implied_price": 285409.9996
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0051,
+          "shares": 34225,
+          "value_usd_mm": 9768.157,
+          "reported_implied_price": 285409.9927
+        }
+      ],
+      "portfolio_count": 5,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -133,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Momentum 3M (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 1.33
+    },
+    {
+      "cusip": "46625H100",
+      "name": "JPMORGAN CHASE & CO.",
+      "ticker": "JPM",
+      "sector": "XLF",
+      "current_weight_pct": 1.38,
+      "holding_streak": 4,
+      "weight_trend": 0.4361,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 4.76,
+      "momentum_6m": 4.28,
+      "rel_momentum": 1.44,
+      "source": "held",
+      "pred_delta_pp": -2.9768,
+      "signal": -1.0,
+      "asset": "JPMORGAN CHASE & CO.",
+      "portfolio": "AQR, D. E. Shaw (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.3808,
+          "shares": 2204020,
+          "value_usd_mm": 710179.324,
+          "reported_implied_price": 322219.9998
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0724,
+          "shares": 410089,
+          "value_usd_mm": 132138.878,
+          "reported_implied_price": 322220.001
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.001,
+          "shares": 2101,
+          "value_usd_mm": 676.701,
+          "reported_implied_price": 322085.1975
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0,
+          "shares": 37,
+          "value_usd_mm": 11.922,
+          "reported_implied_price": 322216.2162
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -138,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Momentum 3M (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 1.38
+    },
+    {
+      "cusip": "496902404",
+      "name": "KINROSS GOLD CORP",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 1.09,
+      "holding_streak": 4,
+      "weight_trend": 0.3614,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -3.6498,
+      "signal": -1.0,
+      "asset": "KINROSS GOLD CORP",
+      "portfolio": "AQR, Bridgewater (+4)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 1.0911,
+          "shares": 24975313,
+          "value_usd_mm": 703304.814,
+          "reported_implied_price": 28160.0
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0979,
+          "shares": 6627352,
+          "value_usd_mm": 186671.578,
+          "reported_implied_price": 28166.8422
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.0531,
+          "shares": 969400,
+          "value_usd_mm": 27298.304,
+          "reported_implied_price": 28160.0
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0532,
+          "shares": 517661,
+          "value_usd_mm": 14599.872,
+          "reported_implied_price": 28203.5386
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0068,
+          "shares": 442778,
+          "value_usd_mm": 12469.463,
+          "reported_implied_price": 28161.8847
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.0064,
+          "shares": 161529,
+          "value_usd_mm": 4548.657,
+          "reported_implied_price": 28160.0022
+        }
+      ],
+      "portfolio_count": 6,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -109,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 1.09
+    },
+    {
+      "cusip": "57636Q104",
+      "name": "MASTERCARD INCORPORATED",
+      "ticker": "MA",
+      "sector": "XLF",
+      "current_weight_pct": 1.36,
+      "holding_streak": 4,
+      "weight_trend": 0.4502,
+      "sector_flow_z": 0.0,
+      "momentum_3m": -0.48,
+      "momentum_6m": -8.84,
+      "rel_momentum": -3.8,
+      "source": "held",
+      "pred_delta_pp": -3.7127,
+      "signal": -1.0,
+      "asset": "MASTERCARD INCORPORATED",
+      "portfolio": "AQR, Bridgewater (+4)",
+      "portfolio_positions": [
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.363,
+          "shares": 1227980,
+          "value_usd_mm": 701029.222,
+          "reported_implied_price": 570879.9997
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.3555,
+          "shares": 441496,
+          "value_usd_mm": 252041.236,
+          "reported_implied_price": 570879.9989
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.8519,
+          "shares": 409207,
+          "value_usd_mm": 233608.092,
+          "reported_implied_price": 570879.9996
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0123,
+          "shares": 39174,
+          "value_usd_mm": 22363.653,
+          "reported_implied_price": 570879.9969
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.0051,
+          "shares": 5757,
+          "value_usd_mm": 3286.444,
+          "reported_implied_price": 570860.5176
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0,
+          "shares": 17,
+          "value_usd_mm": 9.705,
+          "reported_implied_price": 570882.3529
+        }
+      ],
+      "portfolio_count": 6,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -136,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Relative Momentum (Bearish)",
+      "flow_signal": "Outflow",
+      "last_13f_wt_pct": 1.36
+    },
+    {
+      "cusip": "92343E102",
+      "name": "VERISIGN INC",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 1.05,
+      "holding_streak": 4,
+      "weight_trend": 0.0165,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -4.3145,
+      "signal": -1.0,
+      "asset": "VERISIGN INC",
+      "portfolio": "AQR, Bridgewater (+5)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 1.0475,
+          "shares": 2779351,
+          "value_usd_mm": 675243.325,
+          "reported_implied_price": 242949.9998
+        },
+        {
+          "cik": "1603466",
+          "portfolio": "Point72",
+          "weight_pct": 0.2662,
+          "shares": 979716,
+          "value_usd_mm": 238022.002,
+          "reported_implied_price": 242949.9998
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.0856,
+          "shares": 249882,
+          "value_usd_mm": 60708.832,
+          "reported_implied_price": 242950.0004
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.113,
+          "shares": 239215,
+          "value_usd_mm": 58117.284,
+          "reported_implied_price": 242949.999
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.1352,
+          "shares": 152607,
+          "value_usd_mm": 37075.871,
+          "reported_implied_price": 242950.0023
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0074,
+          "shares": 58347,
+          "value_usd_mm": 14175.404,
+          "reported_implied_price": 242950.006
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0052,
+          "shares": 39304,
+          "value_usd_mm": 9548.907,
+          "reported_implied_price": 242950.0051
+        }
+      ],
+      "portfolio_count": 7,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -105,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 1.05
+    },
+    {
+      "cusip": "64110L106",
+      "name": "NETFLIX INC",
+      "ticker": "NFLX",
+      "sector": "XLC",
+      "current_weight_pct": 1.04,
+      "holding_streak": 4,
+      "weight_trend": 0.2247,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 12.99,
+      "momentum_6m": -11.11,
+      "rel_momentum": 9.68,
+      "source": "held",
+      "pred_delta_pp": -3.4328,
+      "signal": -1.0,
+      "asset": "NETFLIX INC",
+      "portfolio": "AQR, Bridgewater (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 1.0441,
+          "shares": 7178287,
+          "value_usd_mm": 673035.74,
+          "reported_implied_price": 93759.9374
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.3699,
+          "shares": 2029230,
+          "value_usd_mm": 190260.605,
+          "reported_implied_price": 93760.0001
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0061,
+          "shares": 125139,
+          "value_usd_mm": 11689.234,
+          "reported_implied_price": 93410.0001
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0062,
+          "shares": 18027,
+          "value_usd_mm": 1690.212,
+          "reported_implied_price": 93760.0266
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -104,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Momentum 3M (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 1.04
+    },
+    {
+      "cusip": "30161Q104",
+      "name": "EXELIXIS INC",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 0.95,
+      "holding_streak": 4,
+      "weight_trend": -0.0968,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -2.0408,
+      "signal": -1.0,
+      "asset": "EXELIXIS INC",
+      "portfolio": "AQR, Bridgewater (+5)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.9461,
+          "shares": 13914043,
+          "value_usd_mm": 609852.505,
+          "reported_implied_price": 43830.0
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.3095,
+          "shares": 13460477,
+          "value_usd_mm": 589972.701,
+          "reported_implied_price": 43829.9996
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.148,
+          "shares": 925712,
+          "value_usd_mm": 40573.957,
+          "reported_implied_price": 43830.0
+        },
+        {
+          "cik": "1603466",
+          "portfolio": "Point72",
+          "weight_pct": 0.042,
+          "shares": 855980,
+          "value_usd_mm": 37517.603,
+          "reported_implied_price": 43829.9995
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.0169,
+          "shares": 273791,
+          "value_usd_mm": 12000.26,
+          "reported_implied_price": 43830.0017
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.019,
+          "shares": 222690,
+          "value_usd_mm": 9760.503,
+          "reported_implied_price": 43830.0013
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0005,
+          "shares": 22561,
+          "value_usd_mm": 988.849,
+          "reported_implied_price": 43830.0164
+        }
+      ],
+      "portfolio_count": 7,
+      "pred_wt_pct": 0.0,
+      "weight_delta_bps": -95,
+      "status": "EXITED",
+      "thesis_conviction": 1.0,
+      "top_tft_driver": "Weight Trend (Bearish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 0.95
+    },
+    {
+      "cusip": "743315103",
+      "name": "PROGRESSIVE CORP",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 1.09,
+      "holding_streak": 4,
+      "weight_trend": 0.3316,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": 1.7332,
+      "signal": 0.999,
+      "asset": "PROGRESSIVE CORP",
+      "portfolio": "AQR, Renaissance (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.0882,
+          "shares": 2457800,
+          "value_usd_mm": 559690.216,
+          "reported_implied_price": 227720.0
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.3039,
+          "shares": 946277,
+          "value_usd_mm": 215486.198,
+          "reported_implied_price": 227719.9995
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.0934,
+          "shares": 264300,
+          "value_usd_mm": 60186.396,
+          "reported_implied_price": 227720.0
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0008,
+          "shares": 6502,
+          "value_usd_mm": 1480.635,
+          "reported_implied_price": 227719.9323
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 2.82,
+      "weight_delta_bps": 173,
+      "status": "ACCUMULATING",
+      "thesis_conviction": 0.999,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 1.09
+    },
+    {
+      "cusip": "872590104",
+      "name": "T-MOBILE US INC",
+      "ticker": "",
+      "sector": "XLC",
+      "current_weight_pct": 1.12,
+      "holding_streak": 4,
+      "weight_trend": 0.3159,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": 1.6428,
+      "signal": 0.999,
+      "asset": "T-MOBILE US INC",
+      "portfolio": "AQR, Bridgewater (+4)",
+      "portfolio_positions": [
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.1163,
+          "shares": 2827787,
+          "value_usd_mm": 574153.872,
+          "reported_implied_price": 203039.9998
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.1292,
+          "shares": 1213462,
+          "value_usd_mm": 246381.398,
+          "reported_implied_price": 203040.0606
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.339,
+          "shares": 1183865,
+          "value_usd_mm": 240371.95,
+          "reported_implied_price": 203040.0003
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.3414,
+          "shares": 1083807,
+          "value_usd_mm": 220056.173,
+          "reported_implied_price": 203039.9997
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.17,
+          "shares": 229631,
+          "value_usd_mm": 46624.278,
+          "reported_implied_price": 203039.999
+        },
+        {
+          "cik": "1564702",
+          "portfolio": "PDT Partners",
+          "weight_pct": 0.1686,
+          "shares": 12800,
+          "value_usd_mm": 2598.912,
+          "reported_implied_price": 203040.0
+        }
+      ],
+      "portfolio_count": 6,
+      "pred_wt_pct": 2.76,
+      "weight_delta_bps": 164,
+      "status": "ACCUMULATING",
+      "thesis_conviction": 0.999,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 1.12
+    },
+    {
+      "cusip": "023135106",
+      "name": "AMAZON COM INC",
+      "ticker": "AMZN",
+      "sector": "XLY",
+      "current_weight_pct": 14.28,
+      "holding_streak": 4,
+      "weight_trend": 4.745,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 4.77,
+      "momentum_6m": 11.75,
+      "rel_momentum": 1.45,
+      "source": "held",
+      "pred_delta_pp": -1.4673,
+      "signal": -0.998,
+      "asset": "AMAZON COM INC",
+      "portfolio": "AQR, Bridgewater (+4)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 14.283,
+          "shares": 9607824,
+          "value_usd_mm": 2217677.936,
+          "reported_implied_price": 230820.0
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 2.2345,
+          "shares": 4979120,
+          "value_usd_mm": 1149280.478,
+          "reported_implied_price": 230819.9999
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 1.6399,
+          "shares": 1948254,
+          "value_usd_mm": 449695.988,
+          "reported_implied_price": 230819.9999
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.319,
+          "shares": 890926,
+          "value_usd_mm": 205645.092,
+          "reported_implied_price": 230821.7428
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.048,
+          "shares": 379595,
+          "value_usd_mm": 87618.118,
+          "reported_implied_price": 230820.0003
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0,
+          "shares": 289,
+          "value_usd_mm": 66.707,
+          "reported_implied_price": 230820.0692
+        }
+      ],
+      "portfolio_count": 6,
+      "pred_wt_pct": 12.81,
+      "weight_delta_bps": -147,
+      "status": "TRIMMING",
+      "thesis_conviction": 0.998,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 14.28
+    },
+    {
+      "cusip": "69608A108",
+      "name": "PALANTIR TECHNOLOGIES INC",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 2.43,
+      "holding_streak": 4,
+      "weight_trend": -0.2366,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -1.3405,
+      "signal": -0.996,
+      "asset": "PALANTIR TECHNOLOGIES INC",
+      "portfolio": "AQR, Bridgewater (+3)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 2.4257,
+          "shares": 8796727,
+          "value_usd_mm": 1563618.224,
+          "reported_implied_price": 177750.0
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.2698,
+          "shares": 3674200,
+          "value_usd_mm": 653089.05,
+          "reported_implied_price": 177750.0
+        },
+        {
+          "cik": "1564702",
+          "portfolio": "PDT Partners",
+          "weight_pct": 0.7305,
+          "shares": 63363,
+          "value_usd_mm": 11262.773,
+          "reported_implied_price": 177749.9961
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0035,
+          "shares": 37756,
+          "value_usd_mm": 6711.129,
+          "reported_implied_price": 177750.0
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.0208,
+          "shares": 32056,
+          "value_usd_mm": 5697.954,
+          "reported_implied_price": 177750.0
+        }
+      ],
+      "portfolio_count": 5,
+      "pred_wt_pct": 1.09,
+      "weight_delta_bps": -134,
+      "status": "TRIMMING",
+      "thesis_conviction": 0.996,
+      "top_tft_driver": "Weight Trend (Bearish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 2.43
+    },
+    {
+      "cusip": "02079K107",
+      "name": "ALPHABET INC",
+      "ticker": "GOOG",
+      "sector": "XLC",
+      "current_weight_pct": 12.46,
+      "holding_streak": 4,
+      "weight_trend": -4.14,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 3.41,
+      "momentum_6m": 30.46,
+      "rel_momentum": 0.1,
+      "source": "held",
+      "pred_delta_pp": 1.2361,
+      "signal": 0.994,
+      "asset": "ALPHABET INC",
+      "portfolio": "AQR, D. E. Shaw (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 12.4574,
+          "shares": 6163871,
+          "value_usd_mm": 1934222.72,
+          "reported_implied_price": 313800.0
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0374,
+          "shares": 227202,
+          "value_usd_mm": 71295.988,
+          "reported_implied_price": 313800.0018
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.0292,
+          "shares": 170000,
+          "value_usd_mm": 53346.0,
+          "reported_implied_price": 313800.0
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.0497,
+          "shares": 102081,
+          "value_usd_mm": 32033.315,
+          "reported_implied_price": 313802.9114
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 13.7,
+      "weight_delta_bps": 124,
+      "status": "ACCUMULATING",
+      "thesis_conviction": 0.994,
+      "top_tft_driver": "Weight Trend (Bearish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 12.46
+    },
+    {
+      "cusip": "44267T102",
+      "name": "HOWARD HUGHES HOLDINGS INC",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 9.69,
+      "holding_streak": 4,
+      "weight_trend": 0.0041,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": -1.2455,
+      "signal": -0.994,
+      "asset": "HOWARD HUGHES HOLDINGS INC",
+      "portfolio": "AQR, Pershing Square (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 9.6854,
+          "shares": 18852064,
+          "value_usd_mm": 1503829.145,
+          "reported_implied_price": 79770.0
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.0184,
+          "shares": 148400,
+          "value_usd_mm": 11837.868,
+          "reported_implied_price": 79770.0
+        },
+        {
+          "cik": "1179392",
+          "portfolio": "Two Sigma Investments",
+          "weight_pct": 0.006,
+          "shares": 52912,
+          "value_usd_mm": 4220.79,
+          "reported_implied_price": 79769.9955
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0,
+          "shares": 854,
+          "value_usd_mm": 68.124,
+          "reported_implied_price": 79770.4918
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 8.44,
+      "weight_delta_bps": -125,
+      "status": "TRIMMING",
+      "thesis_conviction": 0.994,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 9.69
+    },
+    {
+      "cusip": "88160R101",
+      "name": "TESLA INC",
+      "ticker": "TSLA",
+      "sector": "XLY",
+      "current_weight_pct": 1.22,
+      "holding_streak": 4,
+      "weight_trend": 0.1623,
+      "sector_flow_z": 0.0,
+      "momentum_3m": -10.79,
+      "momentum_6m": -7.63,
+      "rel_momentum": -14.1,
+      "source": "held",
+      "pred_delta_pp": -1.1603,
+      "signal": -0.991,
+      "asset": "TESLA INC",
+      "portfolio": "AQR, Renaissance (+1)",
+      "portfolio_positions": [
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 1.2154,
+          "shares": 1389973,
+          "value_usd_mm": 625098.658,
+          "reported_implied_price": 449720.0003
+        },
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.9503,
+          "shares": 1362122,
+          "value_usd_mm": 612583.061,
+          "reported_implied_price": 449727.0149
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0027,
+          "shares": 11419,
+          "value_usd_mm": 5135.386,
+          "reported_implied_price": 449722.9179
+        }
+      ],
+      "portfolio_count": 3,
+      "pred_wt_pct": 0.06,
+      "weight_delta_bps": -116,
+      "status": "TRIMMING",
+      "thesis_conviction": 0.991,
+      "top_tft_driver": "Momentum 3M (Bearish)",
+      "flow_signal": "Outflow",
+      "last_13f_wt_pct": 1.22
+    },
+    {
+      "cusip": "30303M102",
+      "name": "META PLATFORMS INC",
+      "ticker": "META",
+      "sector": "XLC",
+      "current_weight_pct": 11.37,
+      "holding_streak": 4,
+      "weight_trend": 3.7177,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 4.61,
+      "momentum_6m": -6.59,
+      "rel_momentum": 1.3,
+      "source": "held",
+      "pred_delta_pp": -1.0962,
+      "signal": -0.988,
+      "asset": "META PLATFORMS INC",
+      "portfolio": "AQR, Bridgewater (+3)",
+      "portfolio_positions": [
+        {
+          "cik": "1336528",
+          "portfolio": "Pershing Square",
+          "weight_pct": 11.3662,
+          "shares": 2673569,
+          "value_usd_mm": 1764796.161,
+          "reported_implied_price": 660089.9999
+        },
+        {
+          "cik": "1009207",
+          "portfolio": "D. E. Shaw",
+          "weight_pct": 0.3084,
+          "shares": 852433,
+          "value_usd_mm": 562682.499,
+          "reported_implied_price": 660090.0
+        },
+        {
+          "cik": "1350694",
+          "portfolio": "Bridgewater",
+          "weight_pct": 0.5385,
+          "shares": 223701,
+          "value_usd_mm": 147662.793,
+          "reported_implied_price": 660089.9996
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.213,
+          "shares": 165980,
+          "value_usd_mm": 109561.738,
+          "reported_implied_price": 660089.9988
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0028,
+          "shares": 8149,
+          "value_usd_mm": 5378.898,
+          "reported_implied_price": 660068.4747
+        }
+      ],
+      "portfolio_count": 5,
+      "pred_wt_pct": 10.27,
+      "weight_delta_bps": -110,
+      "status": "TRIMMING",
+      "thesis_conviction": 0.988,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Inflow",
+      "last_13f_wt_pct": 11.37
+    },
+    {
+      "cusip": "146869102",
+      "name": "CARVANA CO",
+      "ticker": "",
+      "sector": "Other",
+      "current_weight_pct": 0.92,
+      "holding_streak": 4,
+      "weight_trend": 0.0797,
+      "sector_flow_z": 0.0,
+      "momentum_3m": 0.0,
+      "momentum_6m": 0.0,
+      "rel_momentum": 0.0,
+      "source": "held",
+      "pred_delta_pp": 0.9743,
+      "signal": 0.979,
+      "asset": "CARVANA CO",
+      "portfolio": "AQR, PDT Partners (+2)",
+      "portfolio_positions": [
+        {
+          "cik": "1037389",
+          "portfolio": "Renaissance",
+          "weight_pct": 0.9214,
+          "shares": 1407398,
+          "value_usd_mm": 593950.104,
+          "reported_implied_price": 422020.0
+        },
+        {
+          "cik": "1478735",
+          "portfolio": "Two Sigma Advisers",
+          "weight_pct": 0.2538,
+          "shares": 309275,
+          "value_usd_mm": 130520.235,
+          "reported_implied_price": 422019.9984
+        },
+        {
+          "cik": "1564702",
+          "portfolio": "PDT Partners",
+          "weight_pct": 0.6823,
+          "shares": 24928,
+          "value_usd_mm": 10520.115,
+          "reported_implied_price": 422020.0177
+        },
+        {
+          "cik": "1167557",
+          "portfolio": "AQR",
+          "weight_pct": 0.0,
+          "shares": 7,
+          "value_usd_mm": 2.954,
+          "reported_implied_price": 422000.0
+        }
+      ],
+      "portfolio_count": 4,
+      "pred_wt_pct": 1.89,
+      "weight_delta_bps": 97,
+      "status": "ACCUMULATING",
+      "thesis_conviction": 0.979,
+      "top_tft_driver": "Weight Trend (Bullish)",
+      "flow_signal": "Neutral",
+      "last_13f_wt_pct": 0.92
+    }
+  ],
+  "columnsDefs": [
+    {
+      "field": "asset",
+      "headerName": "Asset",
+      "headerTooltip": "Security name from the 13F filing (company/issuer name)."
+    },
+    {
+      "field": "ticker",
+      "headerName": "Ticker",
+      "headerTooltip": "Exchange ticker inferred from CUSIP/company mapping."
+    },
+    {
+      "field": "sector",
+      "headerName": "Sector",
+      "headerTooltip": "Mapped economic sector proxy used in feature engineering."
+    },
+    {
+      "field": "status",
+      "headerName": "Status",
+      "headerTooltip": "Action badge for fast scanning: NEW POSITION, ACCUMULATING, TRIMMING, or EXITED."
+    },
+    {
+      "field": "portfolio_count",
+      "headerName": "In Portfolios",
+      "headerTooltip": "How many tracked fund portfolios currently hold this stock. Click row for full holder breakdown."
+    },
+    {
+      "field": "thesis_conviction",
+      "headerName": "Thesis Conviction",
+      "headerTooltip": "A 0 to 1 strength score for how strongly current signals align with the strategy thesis; higher = stronger alignment."
+    },
+    {
+      "field": "top_tft_driver",
+      "headerName": "Top TFT Driver",
+      "headerTooltip": "The #1 driver behind the prediction (for example momentum, flow pressure, or weight-trend behavior)."
+    },
+    {
+      "field": "flow_signal",
+      "headerName": "Flow Signal",
+      "headerTooltip": "Institutional flow pressure regime. Strong positive z-scores indicate unusually aggressive buying activity."
+    }
+  ]
+}

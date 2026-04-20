@@ -117,6 +117,47 @@ if [[ ! -f "$ROOT/data/13f_holdings.parquet" ]]; then
   "$PYTHON_BIN" scripts/ingest.py
 fi
 
+if [[ ! -f "$ROOT/data/signals_cache.json" ]]; then
+  echo "Missing data/signals_cache.json — building prediction cache..."
+  "$PYTHON_BIN" scripts/refresh_signals.py
+else
+  CACHE_STATUS="$($PYTHON_BIN - <<'PY'
+import json
+from pathlib import Path
+import pandas as pd
+
+root = Path.cwd()
+cache_path = root / "data" / "signals_cache.json"
+holdings_path = root / "data" / "13f_holdings.parquet"
+
+if not cache_path.exists() or not holdings_path.exists():
+    print("stale")
+    raise SystemExit(0)
+
+try:
+    cache = json.loads(cache_path.read_text())
+    cached_period = str(cache.get("latest_period", ""))[:10]
+except Exception:
+    print("stale")
+    raise SystemExit(0)
+
+try:
+    holdings = pd.read_parquet(holdings_path)
+    latest_period = str(holdings["period"].max())[:10] if not holdings.empty else ""
+except Exception:
+    print("stale")
+    raise SystemExit(0)
+
+print("fresh" if latest_period and latest_period == cached_period else "stale")
+PY
+)"
+
+  if [[ "$CACHE_STATUS" != "fresh" ]]; then
+    echo "Signals cache is stale for latest filing period — refreshing..."
+    "$PYTHON_BIN" scripts/refresh_signals.py
+  fi
+fi
+
 echo "Stopping any previous local servers on ports ${BACKEND_PORT}/${FRONTEND_PORT}..."
 kill_listeners "$BACKEND_PORT"
 kill_listeners "$FRONTEND_PORT"

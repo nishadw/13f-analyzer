@@ -828,53 +828,61 @@ def tracked_funds(request: Request):
     return JSONResponse(content=summary.to_dict(orient="records"))
 
 
-# ── Stock signals (unified GBC model) ─────────────────────────────────────────
+# ── Stock signals (cache-only at request time) ─────────────────────────────────
+
+_SIGNALS_CACHE_PATH = config.DATA_DIR / "signals_cache.json"
+def _load_signals_cache() -> dict | None:
+    if not _SIGNALS_CACHE_PATH.exists():
+        return None
+    try:
+        return json.loads(_SIGNALS_CACHE_PATH.read_text())
+    except Exception:
+        return None
+
+
+def _write_signals_cache(result: dict, latest_period: str) -> None:
+    from datetime import datetime, timezone
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "latest_period": latest_period,
+        **result,
+    }
+    try:
+        _SIGNALS_CACHE_PATH.write_text(json.dumps(payload))
+    except Exception as e:
+        print(f"[stock_signals] Cache write failed: {e}")
+
 
 @app.get("/stock_signals")
 def stock_signals(
     request: Request,
     cik: str = Query(default=""),
-    top_n: int = Query(default=30),
+    top_n: int = Query(default=20),
     include_candidates: bool = Query(default=True),
 ):
-    """
-    Unified stock signal table for a fund.
-
-    Trains a GradientBoostingClassifier on all available 13F quarterly
-    transitions (increase / hold / decrease / new_buy / exited) combined with
-    real price features (momentum, volatility) fetched from yfinance.
-
-    Returns signal ∈ [-1, +1]:
-      signal = tanh((P(increase) - P(decrease)) * 2.5)
-
-    Positive → model predicts the fund will grow this position.
-    Negative → model predicts a reduction or exit.
-    Candidates (source="candidate") are stocks not currently held that the
-    model scores as likely new buys based on other funds' patterns.
-    """
+    """Return pre-computed ML signals from cache. Never retrain during requests."""
     _check_api_key(request)
 
-    try:
-        from model.stock_predictor import generate_signals
-
-        holdings = _load_parquet(config.DATA_DIR / "13f_holdings.parquet")
-        if holdings.empty:
-            return JSONResponse(content={"data": [], "columnsDefs": []})
-
-        feature_store = _load_parquet(config.DATA_DIR / "features.parquet")
-
-        result = generate_signals(
-            cik=cik,
-            holdings=holdings,
-            feature_store=feature_store,
-            top_n=top_n,
-            include_candidates=include_candidates,
-        )
-        return JSONResponse(content=result)
-
-    except Exception as e:
-        print(f"[stock_signals] Error: {e}")
-        import traceback; traceback.print_exc()
+    holdings = _load_parquet(config.DATA_DIR / "13f_holdings.parquet")
+    if holdings.empty:
         return JSONResponse(content={"data": [], "columnsDefs": []})
+
+    latest_period = str(holdings["period"].max())[:10]
+    cache = _load_signals_cache()
+
+    if cache:
+        if cache.get("latest_period") != latest_period:
+            print(
+                f"[stock_signals] Cache period {cache.get('latest_period')} is stale vs {latest_period}. "
+                "Run scripts/refresh_signals.py to refresh."
+            )
+        rows = cache.get("data", [])
+        n = max(10, min(20, int(top_n)))
+        if not include_candidates:
+            rows = [r for r in rows if str(r.get("source", "held")) != "candidate"]
+        return JSONResponse(content={"data": rows[:n], "columnsDefs": cache.get("columnsDefs", [])})
+
+    print("[stock_signals] Cache missing. Run scripts/refresh_signals.py to generate data/signals_cache.json")
+    return JSONResponse(content={"data": [], "columnsDefs": []})
 
 

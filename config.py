@@ -43,6 +43,15 @@ PROXY_ETFS: list[str] = [
     ).split(",")
 ]
 
+# Proactive screening universe (used for finding net-new ideas)
+SCREEN_UNIVERSE_ETFS: list[str] = [
+    e.strip() for e in os.environ.get(
+        "SCREEN_UNIVERSE_ETFS", "SMH,XLU,URNM,BOTZ"
+    ).split(",") if e.strip()
+]
+SCREEN_TRIPWIRE_Z: float = float(os.environ.get("SCREEN_TRIPWIRE_Z", "2.5"))
+SCREEN_MAX_CANDIDATES: int = int(os.environ.get("SCREEN_MAX_CANDIDATES", "10"))
+
 # ── FRED series for macro features ───────────────────────────────────────────
 FRED_SERIES: dict[str, str] = {
     "fed_funds_rate": "FEDFUNDS",

@@ -1,0 +1,12 @@
+{
+  "signature": [
+    206331,
+    "2025-12-31 00:00:00",
+    "2026-02-17 00:00:00",
+    12
+  ],
+  "latest_period": "2025-12-31",
+  "artifact": "/Users/nishad/1_Programming_Workspaces/13f-analyzer/data/stock_model.joblib",
+  "model_type": "HistGradientBoostingRegressor",
+  "delta_scale": 0.4306489986884065
+}

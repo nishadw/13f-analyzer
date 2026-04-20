@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-04-20T06:18:56.835279+00:00",
+  "universe_etfs": [
+    "SMH",
+    "XLU",
+    "URNM",
+    "BOTZ"
+  ],
+  "universe_size": 68,
+  "tripwire_threshold_z": 2.5,
+  "candidates": [
+    {
+      "ticker": "NFLX",
+      "tripwire_score_z": 3.6913,
+      "volume_z": 3.6913,
+      "options_z": 0.0,
+      "dark_pool_z": 0.0
+    }
+  ],
+  "tft_injection": [
+    {
+      "ticker": "NFLX",
+      "last_13f_wt_pct": 0.0,
+      "flow_signal_z": 3.6913,
+      "thesis_conviction": 0.5,
+      "source": "proactive_tripwire"
+    }
+  ],
+  "notes": [
+    "Attach targeted 8-K + transcript GraphRAG scoring for candidates before training refresh.",
+    "OpenBB options/dark-pool z-scores are placeholder 0.0 until a data provider is connected."
+  ]
+}

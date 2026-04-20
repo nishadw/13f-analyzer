@@ -1,20 +1,26 @@
 function getBackendBaseUrl() {
-  return process.env.BACKEND_BASE_URL || "https://one3f-analyzer-6j85.onrender.com";
+  if (process.env.BACKEND_BASE_URL) return process.env.BACKEND_BASE_URL;
+  if (process.env.NODE_ENV !== "production") return "https://localhost:7779";
+  return "https://one3f-analyzer-6j85.onrender.com";
 }
 
-export async function fetchBackendJson(pathname) {
+// Render free tier spins down after inactivity; retry on 502/503 with backoff.
+export async function fetchBackendJson(pathname, { retries = 3, baseDelayMs = 4000 } = {}) {
   const url = new URL(pathname, getBackendBaseUrl()).toString();
 
-  const res = await fetch(url, {
-    // Allow self-signed certs in local dev (Node 18+ supports this via env var)
-    // In production (Render), the cert is valid so this is a no-op.
-    cache: "no-store",
-  });
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, { cache: "no-store" });
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Backend status ${res.status}: ${body}`);
+    if (res.ok) return res.json();
+
+    const isRetryable = res.status === 502 || res.status === 503;
+    if (!isRetryable || attempt === retries) {
+      const body = await res.text().catch(() => "");
+      const compactBody = body.replace(/\s+/g, " ").slice(0, 240);
+      throw new Error(`Backend status ${res.status}: ${compactBody}`);
+    }
+
+    // Exponential backoff: 4s, 8s, 16s
+    await new Promise((r) => setTimeout(r, baseDelayMs * 2 ** attempt));
   }
-
-  return res.json();
 }
