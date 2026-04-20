@@ -1,5 +1,5 @@
 function getBackendBaseUrl() {
-  return process.env.BACKEND_BASE_URL || "https://localhost:7779";
+  return process.env.BACKEND_BASE_URL || "https://one3f-analyzer-6j85.onrender.com";
 }
 
 export async function fetchBackendJson(pathname) {
